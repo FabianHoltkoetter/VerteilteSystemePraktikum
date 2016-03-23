@@ -33,3 +33,6 @@ Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 Last login: Sat Mar 19 18:36:03 2016 from 192.168.56.1
 ```
+
+## c)
+![alt text](Aufgabe_2_2c.png "2.2.c")
