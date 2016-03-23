@@ -22,7 +22,7 @@ Local Address           PID/Program name	Path
 
 ## b)
 
-SSH war bereits aktiviert. Bei Verbindung über SSH erscheint folgende Meldung:
+SSH war bereits aktiviert. Bei Verbindung über SSH mit dem Befehl ```ssh benutzer@192.168.56.101``` erscheint folgende Meldung:
 
 ```
 The programs included with the Debian GNU/Linux system are free software;
