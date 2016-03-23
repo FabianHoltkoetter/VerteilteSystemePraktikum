@@ -5,6 +5,7 @@
 Systemdienste auf Ports:
 
 Befehle:
+
 netstat -lntup | grep "LISTEN"
 
 ps \<PID\>
