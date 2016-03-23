@@ -6,7 +6,8 @@ Systemdienste auf Ports:
 
 Befehle:
 netstat -lntup | grep "LISTEN"
-ps <PID>
+
+ps \<PID\>
 
 ```
 Local Address           PID/Program name	Path
