@@ -5,9 +5,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Philosopher extends Thread {
 
-    public static final int MEDITATION_TIME = 1000;
-    public static final int EAT_TIME = 1000;
-    public static final int SLEEP_TIME = 1000;
+    public static final int MEALS_BEFORE_SLEEP = 3;
+    public static final int MEDITATION_TIME = 3000;
+    public static final int EAT_TIME = 2000;
+    public static final int SLEEP_TIME = 5000;
+
+    private final String PREFIX;
 
     private int id;
     private ReentrantLock leftFork;
@@ -19,36 +22,53 @@ public class Philosopher extends Thread {
     public Philosopher(int id, DiningTable diningTable) {
         this.id = id;
         this.diningTable = diningTable;
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < id; i++)
+            builder.append("\t");
+        builder.append("P");
+        builder.append(this.id);
+
+        PREFIX = builder.toString();
     }
 
     @Override
     public void run() {
         while (true) {
+            System.out.println(String.format("%s 🙏", PREFIX));
             try {
                 // Meditate
                 Thread.sleep(MEDITATION_TIME);
             } catch (InterruptedException e) {
-                System.out.println(String.format("Philosopher %d got interrupted while meditating.", id));
+                System.out.println(String.format("%s got interrupted while meditating.", PREFIX));
             }
-            System.out.println(String.format("Philospher %d finished meditating.", id));
 
+            System.out.println(String.format("%s 🔎", PREFIX));
             // Go to Table
             diningTable.takeSeat(this);
-            System.out.println(String.format("Philospher %d took a seat.", id));
 
+            System.out.println(String.format("%s 🍜", PREFIX));
             try {
                 // Eat
                 Thread.sleep(EAT_TIME);
                 eatCounter++;
             } catch (InterruptedException e) {
-                System.out.println(String.format("Philosopher %d got interrupted while eating.", id));
+                System.out.println(String.format("%s got interrupted while eating.", PREFIX));
             }
-            System.out.println(String.format("Philospher %d finished eating", id));
 
             // Leave Forks and Seat
             leftFork.unlock();
             rightFork.unlock();
             seat.unlock();
+
+            if (eatCounter == MEALS_BEFORE_SLEEP) {
+                System.out.println(String.format("%s 🏨", PREFIX));
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    System.out.println(String.format("%s got interrupted while eating.", PREFIX));
+                }
+            }
         }
     }
 
