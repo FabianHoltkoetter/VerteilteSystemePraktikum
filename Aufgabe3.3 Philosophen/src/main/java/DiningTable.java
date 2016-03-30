@@ -25,12 +25,20 @@ public class DiningTable {
         while (!tookSeat) {
             for (int i = 0; i < seats.length; i++) {
                 if (philosopher.takeSeat(seats[i])) {
-                    if(philosopher.takeLeftFork(forks[i]) && philosopher.takeRightFork(forks[(i+1)%seats.length])) {
-                        tookSeat = true;
+                    if (philosopher.takeLeftFork(forks[i])) {
+                        if (philosopher.takeRightFork(forks[(i + 1) % seats.length])) {
+                            tookSeat = true;
+                        } else {
+                            forks[i].unlock();
+                            seats[i].unlock();
+                        }
+                    } else {
+                        seats[i].unlock();
                     }
                 }
             }
         }
+
     }
 
     public void leaveSeat(Philosopher philosopher) {

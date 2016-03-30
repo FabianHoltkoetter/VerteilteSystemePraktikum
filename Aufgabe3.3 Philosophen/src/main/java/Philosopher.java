@@ -77,6 +77,7 @@ public class Philosopher extends Thread {
             this.leftFork = leftFork;
             return true;
         }
+        this.leftFork = null;
         return false;
     }
 
@@ -85,6 +86,7 @@ public class Philosopher extends Thread {
             this.rightFork = rightFork;
             return true;
         }
+        this.rightFork = null;
         return false;
     }
 
@@ -93,6 +95,7 @@ public class Philosopher extends Thread {
             this.seat = seat;
             return true;
         }
+        this.seat = null;
         return false;
     }
 }
