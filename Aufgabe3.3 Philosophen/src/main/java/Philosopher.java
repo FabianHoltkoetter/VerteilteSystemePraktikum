@@ -10,7 +10,7 @@ public class Philosopher extends Thread {
     public static final int EAT_TIME = 2000;
     public static final int SLEEP_TIME = 5000;
 
-    private final String PREFIX;
+    public final String PREFIX;
 
     private int id;
     private ReentrantLock leftFork;
@@ -25,7 +25,7 @@ public class Philosopher extends Thread {
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < id; i++)
-            builder.append("\t");
+            builder.append("\t\t");
         builder.append("P");
         builder.append(this.id);
 
@@ -56,10 +56,12 @@ public class Philosopher extends Thread {
                 System.out.println(String.format("%s got interrupted while eating.", PREFIX));
             }
 
-            // Leave Forks and Seat
-            leftFork.unlock();
-            rightFork.unlock();
-            seat.unlock();
+            synchronized (diningTable) {
+                // Leave Forks and Seat
+                leftFork.unlock();
+                rightFork.unlock();
+                seat.unlock();
+            }
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
                 System.out.println(String.format("%s 🏨", PREFIX));
@@ -77,7 +79,6 @@ public class Philosopher extends Thread {
             this.leftFork = leftFork;
             return true;
         }
-        this.leftFork = null;
         return false;
     }
 
@@ -86,7 +87,6 @@ public class Philosopher extends Thread {
             this.rightFork = rightFork;
             return true;
         }
-        this.rightFork = null;
         return false;
     }
 
@@ -95,7 +95,6 @@ public class Philosopher extends Thread {
             this.seat = seat;
             return true;
         }
-        this.seat = null;
         return false;
     }
 }

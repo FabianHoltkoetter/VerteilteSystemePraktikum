@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,16 +25,18 @@ public class DiningTable {
         boolean tookSeat = false;
         while (!tookSeat) {
             for (int i = 0; i < seats.length; i++) {
-                if (philosopher.takeSeat(seats[i])) {
-                    if (philosopher.takeLeftFork(forks[i])) {
-                        if (philosopher.takeRightFork(forks[(i + 1) % seats.length])) {
-                            tookSeat = true;
+                synchronized(this) {
+                    if (philosopher.takeSeat(seats[i])) {
+                        if (philosopher.takeLeftFork(forks[i])) {
+                            if (philosopher.takeRightFork(forks[(i + 1) % seats.length])) {
+                                tookSeat = true;
+                            } else {
+                                forks[i].unlock();
+                                seats[i].unlock();
+                            }
                         } else {
-                            forks[i].unlock();
                             seats[i].unlock();
                         }
-                    } else {
-                        seats[i].unlock();
                     }
                 }
             }
