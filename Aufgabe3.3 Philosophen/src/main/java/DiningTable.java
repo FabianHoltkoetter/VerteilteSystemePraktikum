@@ -25,15 +25,13 @@ public class DiningTable {
         boolean tookSeat = false;
         while (!tookSeat) {
             for (int i = 0; i < seats.length; i++) {
-                synchronized(this) {
-                    if (philosopher.takeSeat(seats[i])) {
-                        if (philosopher.takeLeftFork(forks[i])) {
-                            if (philosopher.takeRightFork(forks[(i + 1) % seats.length])) {
-                                tookSeat = true;
-                            } else {
-                                forks[i].unlock();
-                                seats[i].unlock();
-                            }
+                synchronized (this) {
+                    if (seats[i].tryLock()) {
+                        if (!forks[i].isLocked() && !forks[(i + 1) % forks.length].isLocked()) {
+                            philosopher.setSeat(seats[i]);
+                            philosopher.setLeftFork(forks[i]);
+                            philosopher.setRightFork(forks[(i + 1) % forks.length]);
+                            tookSeat = true;
                         } else {
                             seats[i].unlock();
                         }
@@ -42,14 +40,5 @@ public class DiningTable {
             }
         }
 
-    }
-
-    public void leaveSeat(Philosopher philosopher) {
-        for (int i = 0; i < seats.length; i++) {
-            if (seats[i].equals(philosopher)) {
-                seats[i] = null;
-            }
-        }
-        notifyAll();
     }
 }

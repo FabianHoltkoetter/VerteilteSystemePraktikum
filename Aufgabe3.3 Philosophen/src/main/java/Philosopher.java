@@ -47,6 +47,10 @@ public class Philosopher extends Thread {
             // Go to Table
             diningTable.takeSeat(this);
 
+            System.out.println(String.format("%s 🕑", PREFIX));
+            leftFork.lock();
+            rightFork.lock();
+
             System.out.println(String.format("%s 🍜", PREFIX));
             try {
                 // Eat
@@ -61,6 +65,10 @@ public class Philosopher extends Thread {
                 leftFork.unlock();
                 rightFork.unlock();
                 seat.unlock();
+
+                leftFork = null;
+                rightFork = null;
+                seat = null;
             }
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
@@ -74,27 +82,15 @@ public class Philosopher extends Thread {
         }
     }
 
-    public boolean takeLeftFork(ReentrantLock leftFork) {
-        if (leftFork.tryLock()) {
-            this.leftFork = leftFork;
-            return true;
-        }
-        return false;
+    public void setLeftFork(ReentrantLock leftFork) {
+        this.leftFork = leftFork;
     }
 
-    public boolean takeRightFork(ReentrantLock rightFork) {
-        if (rightFork.tryLock()) {
-            this.rightFork = rightFork;
-            return true;
-        }
-        return false;
+    public void setRightFork(ReentrantLock rightFork) {
+        this.rightFork = rightFork;
     }
 
-    public boolean takeSeat(ReentrantLock seat) {
-        if (seat.tryLock()) {
-            this.seat = seat;
-            return true;
-        }
-        return false;
+    public void setSeat(ReentrantLock seat) {
+        this.seat = seat;
     }
 }
