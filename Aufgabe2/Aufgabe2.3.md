@@ -1,11 +1,14 @@
 # Aufgabe 2.3
-## Abfrage von http://w3-o.cs.hm.edu/~pleier/lehre.verteilte_systeme.html
+## Abfrage einer Webseite
+
+Abgefragte Seite: http://w3-o.cs.hm.edu/~pleier/lehre.verteilte_systeme.html
 
 ###Ablauf
 * 5-11 Handshake
 * 12 Abfrage der Datei über GET
 * 13-19 Übertragung der Daten
 * 19-22 Verbindungsabbau
+
 ###Protokolle
 * TCP/IP
 * HTTP
