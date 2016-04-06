@@ -2,7 +2,7 @@
  * Created by Fabian on 30.03.2016.
  */
 public class Restaurant {
-    private static final String ERROR_PARAMETERS = "Please specify the numbers of how many producers and cnsumers you want to start.";
+    private static final String ERROR_PARAMETERS = "Please specify the numbers of how many philosophers and seats you want to start.";
 
     public static void main(String[] args){
         if (args.length != 2) {

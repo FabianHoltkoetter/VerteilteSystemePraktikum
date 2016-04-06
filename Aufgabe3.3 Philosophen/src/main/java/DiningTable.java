@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -17,7 +14,7 @@ public class DiningTable {
 
         for (int i = 0; i < seats; i++) {
             this.seats[i] = new ReentrantLock();
-            forks[i] = new ReentrantLock();
+            this.forks[i] = new ReentrantLock();
         }
     }
 
@@ -25,20 +22,19 @@ public class DiningTable {
         boolean tookSeat = false;
         while (!tookSeat) {
             for (int i = 0; i < seats.length && !tookSeat; i++) {
-                synchronized (this) {
-                    if (seats[i].tryLock()) {
-                        int left = i;
-                        int right = (i + 1) % forks.length;
-                        if (!forks[left].isLocked() && !forks[right].isLocked()) {
-                            forks[left].lock();
-                            forks[right].lock();
-                            philosopher.setSeatNumber(i);
-                            System.out.println(String.format("%s platz %d",
-                                    philosopher.PREFIX, i));
-                            tookSeat = true;
-                        } else {
-                            seats[i].unlock();
-                        }
+                if (seats[i].tryLock()) {
+                    int left = i;
+                    int right = (i + 1) % forks.length;
+                    if (forks[left].tryLock() && forks[right].tryLock()) {
+                        philosopher.setSeatNumber(i);
+                        System.out.println(String.format("%s platz %d",
+                                philosopher.PREFIX, i));
+                        tookSeat = true;
+                    } else {
+                        seats[i].unlock();
+
+                        if(forks[left].isHeldByCurrentThread())
+                            forks[left].unlock();
                     }
                 }
             }
