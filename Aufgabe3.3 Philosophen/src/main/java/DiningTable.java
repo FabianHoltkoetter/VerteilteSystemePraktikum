@@ -33,8 +33,8 @@ public class DiningTable {
                             forks[left].lock();
                             forks[right].lock();
                             philosopher.setSeatNumber(i);
-                            System.out.println(String.format("%s took seat %d with forks %d and %d",
-                                    philosopher.PREFIX, i, i, (i + 1) % forks.length));
+                            System.out.println(String.format("%s platz %d",
+                                    philosopher.PREFIX, i));
                             tookSeat = true;
                         } else {
                             seats[i].unlock();

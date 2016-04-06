@@ -23,7 +23,7 @@ public class Philosopher extends Thread {
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < id; i++)
-            builder.append("\t\t");
+            builder.append("\t\t\t\t");
         builder.append("P");
         builder.append(this.id);
 
@@ -33,7 +33,7 @@ public class Philosopher extends Thread {
     @Override
     public void run() {
         while (true) {
-            System.out.println(String.format("%s 🙏", PREFIX));
+            System.out.println(String.format("%s Meditiert", PREFIX));
             try {
                 // Meditate
                 Thread.sleep(MEDITATION_TIME);
@@ -41,13 +41,11 @@ public class Philosopher extends Thread {
                 System.out.println(String.format("%s got interrupted while meditating.", PREFIX));
             }
 
-            System.out.println(String.format("%s 🔎", PREFIX));
+            System.out.println(String.format("%s sucht Platz", PREFIX));
             // Go to Table
             diningTable.takeSeat(this);
 
-            System.out.println(String.format("%s 🕑", PREFIX));
-
-            System.out.println(String.format("%s 🍜", PREFIX));
+            System.out.println(String.format("%s isst", PREFIX));
             try {
                 // Eat
                 Thread.sleep(EAT_TIME);
@@ -57,9 +55,10 @@ public class Philosopher extends Thread {
             }
 
             diningTable.leaveSeat(seatNumber);
+            System.out.println(String.format("%s geht", PREFIX));
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
-                System.out.println(String.format("%s 🏨", PREFIX));
+                System.out.println(String.format("%s schläft.", PREFIX));
                 try {
                     Thread.sleep(SLEEP_TIME);
                 } catch (InterruptedException e) {
