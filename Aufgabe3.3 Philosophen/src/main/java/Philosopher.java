@@ -13,9 +13,7 @@ public class Philosopher extends Thread {
     public final String PREFIX;
 
     private int id;
-    private ReentrantLock leftFork;
-    private ReentrantLock rightFork;
-    private ReentrantLock seat;
+    private int seatNumber;
     private DiningTable diningTable;
     private int eatCounter = 0;
 
@@ -48,8 +46,6 @@ public class Philosopher extends Thread {
             diningTable.takeSeat(this);
 
             System.out.println(String.format("%s 🕑", PREFIX));
-            leftFork.lock();
-            rightFork.lock();
 
             System.out.println(String.format("%s 🍜", PREFIX));
             try {
@@ -60,16 +56,7 @@ public class Philosopher extends Thread {
                 System.out.println(String.format("%s got interrupted while eating.", PREFIX));
             }
 
-            synchronized (diningTable) {
-                // Leave Forks and Seat
-                leftFork.unlock();
-                rightFork.unlock();
-                seat.unlock();
-
-                leftFork = null;
-                rightFork = null;
-                seat = null;
-            }
+            diningTable.leaveSeat(seatNumber);
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
                 System.out.println(String.format("%s 🏨", PREFIX));
@@ -82,15 +69,7 @@ public class Philosopher extends Thread {
         }
     }
 
-    public void setLeftFork(ReentrantLock leftFork) {
-        this.leftFork = leftFork;
-    }
-
-    public void setRightFork(ReentrantLock rightFork) {
-        this.rightFork = rightFork;
-    }
-
-    public void setSeat(ReentrantLock seat) {
-        this.seat = seat;
+    public void setSeatNumber(int seatNumber) {
+        this.seatNumber = seatNumber;
     }
 }
