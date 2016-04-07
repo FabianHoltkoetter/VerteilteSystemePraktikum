@@ -64,8 +64,8 @@ public class Philosopher extends Observable implements Runnable {
 
 
             //Leave table
-            diningTable.leaveSeat(seatNumber);
             releaseAll();
+            diningTable.leaveSeat(seatNumber);
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
                 //Sleep after eatCount meals
