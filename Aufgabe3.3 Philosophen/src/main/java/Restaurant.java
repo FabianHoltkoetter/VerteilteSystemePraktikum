@@ -28,14 +28,16 @@ public class Restaurant {
         //Init all
         DiningTable table = new DiningTable(seatCount);
         View view = new View();
+        view.start();
 
         for(int i = 0; i < philosophersCount; i++) {
             Philosopher philosopher = new Philosopher(i, table);
-            new Thread(philosopher).start();
             philosopher.addObserver(view);
+
+            new Thread(philosopher).start();
         }
 
-        view.start();
+
     }
 
 }
