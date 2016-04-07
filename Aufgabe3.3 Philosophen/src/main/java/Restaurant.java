@@ -9,6 +9,7 @@ public class Restaurant {
             throw new IllegalArgumentException(ERROR_PARAMETERS);
         }
 
+        //Get phil. and seat count
         int philosophersCount;
         int seatCount;
         try {
@@ -18,10 +19,17 @@ public class Restaurant {
             throw new IllegalArgumentException(ERROR_PARAMETERS);
         }
 
+        //Init all
         DiningTable table = new DiningTable(seatCount);
+        View view = new View();
+
         for(int i = 0; i < philosophersCount; i++) {
-            new Philosopher(i, table).start();
+            Philosopher philosopher = new Philosopher(i, table);
+            new Thread(philosopher).start();
+            philosopher.addObserver(view);
         }
+
+        view.start();
     }
 
 }

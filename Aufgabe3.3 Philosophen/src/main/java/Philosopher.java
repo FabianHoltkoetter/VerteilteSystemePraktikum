@@ -1,7 +1,9 @@
+import java.util.Observable;
+
 /**
  * Created by Fabian on 30.03.2016.
  */
-public class Philosopher extends Thread {
+public class Philosopher extends Observable implements Runnable {
 
     public static final int MEALS_BEFORE_SLEEP = 3;
     public static final int MEDITATION_TIME = 3000;
@@ -10,20 +12,22 @@ public class Philosopher extends Thread {
 
     public final String PREFIX;
 
-    private int id;
-    private int seatNumber;
-    private DiningTable diningTable;
+    private final DiningTable diningTable;
+
+    private int seatNumber = -1;
+    private int leftForkNumber = -1;
+    private int rightForkNumber = -1;
     private int eatCounter = 0;
 
     public Philosopher(int id, DiningTable diningTable) {
-        this.id = id;
+
         this.diningTable = diningTable;
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < id; i++)
             builder.append("\t\t\t\t");
         builder.append("P");
-        builder.append(this.id);
+        builder.append(id);
 
         PREFIX = builder.toString();
     }
@@ -31,42 +35,90 @@ public class Philosopher extends Thread {
     @Override
     public void run() {
         while (true) {
-            System.out.println(String.format("%s Meditiert", PREFIX));
+
             try {
                 // Meditate
                 Thread.sleep(MEDITATION_TIME);
             } catch (InterruptedException e) {
-                System.out.println(String.format("%s got interrupted while meditating.", PREFIX));
+                throw new AssertionError(PREFIX + " got interrupted while eating.");
+
             }
 
-            System.out.println(String.format("%s sucht Platz", PREFIX));
-            // Go to Table
+            // Go to table
             diningTable.takeSeat(this);
 
-            System.out.println(String.format("%s isst", PREFIX));
             try {
                 // Eat
                 Thread.sleep(EAT_TIME);
                 eatCounter++;
             } catch (InterruptedException e) {
-                System.out.println(String.format("%s got interrupted while eating.", PREFIX));
+                throw new AssertionError(PREFIX + " got interrupted while eating.");
+
             }
 
+
+            //Leave table
             diningTable.leaveSeat(seatNumber);
-            System.out.println(String.format("%s geht", PREFIX));
+            releaseAll();
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
-                System.out.println(String.format("%s schläft.", PREFIX));
+                //Sleep after eatCount meals
                 try {
                     Thread.sleep(SLEEP_TIME);
                 } catch (InterruptedException e) {
-                    System.out.println(String.format("%s got interrupted while eating.", PREFIX));
+                    throw new AssertionError(PREFIX + " got interrupted while eating.");
                 }
             }
         }
     }
 
+    public boolean isEating(){
+        return getLeftForkNumber() >= 0 &&
+                getRightForkNumber() >= 0 &&
+                getSeatNumber() >= 0;
+    }
+
+    public void takeAll(int seatNumber, int leftForkNumber, int rightForkNumber){
+        setSeatNumber(seatNumber);
+        setLeftForkNumber(leftForkNumber);
+        setRightForkNumber(rightForkNumber);
+        setChanged();
+        notifyObservers();
+    }
+
+    private void releaseAll(){
+        setSeatNumber(-1);
+        setLeftForkNumber(-1);
+        setRightForkNumber(-1);
+        setChanged();
+        notifyObservers();
+    }
+
+    public int getSeatNumber() {
+        return seatNumber;
+    }
+
     public void setSeatNumber(int seatNumber) {
         this.seatNumber = seatNumber;
+    }
+
+    public int getLeftForkNumber() {
+        return leftForkNumber;
+    }
+
+    public void setLeftForkNumber(int leftForkNumber) {
+        this.leftForkNumber = leftForkNumber;
+    }
+
+    public int getRightForkNumber() {
+        return rightForkNumber;
+    }
+
+    public void setRightForkNumber(int rightForkNumber) {
+        this.rightForkNumber = rightForkNumber;
+    }
+
+    public int getEatCounter() {
+        return eatCounter;
     }
 }

@@ -3,7 +3,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by Fabian on 30.03.2016.
  */
-public class DiningTable {
+public class DiningTable{
 
     private ReentrantLock[] seats;
     private ReentrantLock[] forks;
@@ -19,31 +19,42 @@ public class DiningTable {
     }
 
     public void takeSeat(Philosopher philosopher) {
-        boolean tookSeat = false;
-        while (!tookSeat) {
-            for (int i = 0; i < seats.length && !tookSeat; i++) {
-                if (seats[i].tryLock()) {
-                    int left = i;
-                    int right = (i + 1) % forks.length;
-                    if (forks[left].tryLock() && forks[right].tryLock()) {
-                        philosopher.setSeatNumber(i);
-                        System.out.println(String.format("%s platz %d",
-                                philosopher.PREFIX, i));
-                        tookSeat = true;
-                    } else {
-                        seats[i].unlock();
 
-                        if(forks[left].isHeldByCurrentThread())
-                            forks[left].unlock();
-                    }
+        //Philosopher runs around the table till he got a seat + forks
+        for (int i = 0; ; i = ( i + 1 ) % seats.length) {
+
+            //Sit down and try to get the left and right fork
+            if (seats[i].tryLock()) {
+
+                //Set index of left and right fork
+                int left = i;
+                int right = (i + 1) % forks.length;
+
+                //Try to get the forks
+                if (forks[left].tryLock() && forks[right].tryLock()) {
+
+                    philosopher.takeAll(i, left, right);
+
+                    return;
+
+                } else {
+                    //Drop fork if held
+                    if(forks[left].isHeldByCurrentThread())
+                        forks[left].unlock();
+
+                    //Stand up
+                    seats[i].unlock();
                 }
             }
         }
+
     }
 
-    public synchronized void leaveSeat(int seatNumber) {
-        seats[seatNumber].unlock();
+    public void leaveSeat(int seatNumber) {
+        //Release forks
         forks[seatNumber].unlock();
         forks[(seatNumber + 1) % forks.length].unlock();
+        //Stand up
+        seats[seatNumber].unlock();
     }
 }
