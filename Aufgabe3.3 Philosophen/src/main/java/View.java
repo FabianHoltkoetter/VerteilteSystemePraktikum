@@ -5,7 +5,7 @@ import java.util.concurrent.SynchronousQueue;
 /**
  * Organization: HM FK07.
  * Project: VerteilteSystemePraktikum, PACKAGE_NAME
- * Author(s): Rene Zarwel
+ * Author(s): Rene Zarwel + Fabian Holtkötter
  * Date: 06.04.16
  * OS: MacOS 10.11
  * Java-Version: 1.8
