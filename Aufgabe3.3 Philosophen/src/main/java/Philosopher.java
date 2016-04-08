@@ -25,7 +25,9 @@ public class Philosopher extends Observable implements Runnable {
     private int rightForkNumber = -1;
     private int eatCounter = 0;
 
-    public Philosopher(int id, DiningTable diningTable) {
+    private int meditationTime = MEDITATION_TIME;
+
+    public Philosopher(int id, DiningTable diningTable, boolean hungry) {
 
         this.diningTable = diningTable;
 
@@ -36,6 +38,9 @@ public class Philosopher extends Observable implements Runnable {
         builder.append(id);
 
         PREFIX = builder.toString();
+
+        if(hungry)
+            meditationTime /= 2;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class Philosopher extends Observable implements Runnable {
 
             try {
                 // Meditate
-                Thread.sleep(MEDITATION_TIME);
+                Thread.sleep(meditationTime);
             } catch (InterruptedException e) {
                 throw new AssertionError(PREFIX + " got interrupted while eating.");
 
