@@ -40,6 +40,8 @@ public class Philosopher extends Observable implements Runnable {
 
     @Override
     public void run() {
+        int seatBuffer;
+
         while (true) {
 
             try {
@@ -64,8 +66,10 @@ public class Philosopher extends Observable implements Runnable {
 
 
             //Leave table
-            diningTable.leaveSeat(seatNumber);
+            seatBuffer =getSeatNumber();
             releaseAll();
+            diningTable.leaveSeat(seatBuffer);
+
 
             if (eatCounter == MEALS_BEFORE_SLEEP) {
                 //Sleep after eatCount meals
