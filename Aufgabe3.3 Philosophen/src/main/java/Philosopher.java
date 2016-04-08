@@ -40,7 +40,7 @@ public class Philosopher extends Observable implements Runnable {
         PREFIX = builder.toString();
 
         if(hungry)
-            meditationTime /= 2;
+            meditationTime /= 3;
     }
 
     @Override
