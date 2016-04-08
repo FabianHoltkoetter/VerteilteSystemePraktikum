@@ -12,9 +12,9 @@ import java.util.Observable;
 public class Philosopher extends Observable implements Runnable {
 
     public static final int MEALS_BEFORE_SLEEP = 3;
-    public static final int MEDITATION_TIME = 3000;
-    public static final int EAT_TIME = 2000;
-    public static final int SLEEP_TIME = 5000;
+    public static final int MEDITATION_TIME = 5;
+    public static final int EAT_TIME = 1;
+    public static final int SLEEP_TIME = 10;
 
     public final String PREFIX;
 
