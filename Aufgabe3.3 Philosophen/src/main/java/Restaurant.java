@@ -29,6 +29,7 @@ public class Restaurant {
 
         //Init all
         DiningTable table = new DiningTable(seatCount);
+        TableMaster master = new TableMaster();
         View view = new View();
         view.start();
 
@@ -36,8 +37,13 @@ public class Restaurant {
             Philosopher philosopher = new Philosopher(i, table, i < hungryPhilosophersCount);
             philosopher.addObserver(view);
 
+            master.addPhilosopher(philosopher);
+
             new Thread(philosopher).start();
         }
+
+        master.start();
+
 
 
     }
