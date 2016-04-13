@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -9,58 +10,55 @@ import java.util.concurrent.locks.ReentrantLock;
  * Java-Version: 1.8
  * System: 2,3 GHz Intel Core i7, 16 GB 1600 MHz DDR3
  */
-public class DiningTable{
+public class DiningTable {
 
-    private ReentrantLock[] seats;
-    private ReentrantLock[] forks;
+  private ReentrantLock[] forks;
+  private Random rGenerator = new Random();
 
-    public DiningTable(int seats) {
-        this.seats = new ReentrantLock[seats];
-        this.forks = new ReentrantLock[seats];
+  public DiningTable(int seats) {
 
-        for (int i = 0; i < seats; i++) {
-            this.seats[i] = new ReentrantLock();
-            this.forks[i] = new ReentrantLock();
-        }
+    this.forks = new ReentrantLock[(seats != 1) ? seats : 2];
+
+    for (int i = 0; i < forks.length; i++) {
+      this.forks[i] = new ReentrantLock();
     }
+  }
 
-    public void takeSeat(Philosopher philosopher) {
+  public void takeSeat(Philosopher philosopher) {
 
-        //Philosopher runs around the table till he got a seat + forks
-        for (int i = 0; ; i = ( i + 1 ) % seats.length) {
+    //Philosopher runs around the table till he got a seat + forks
+    for (int i = 0; ; i = (i + 1) % forks.length) {
 
-            //Sit down and try to get the left and right fork
-            if (seats[i].tryLock()) {
+      //Set index of left and right fork
+      int left = i;
+      int right = (i + 1) % forks.length;
+      boolean rand = rGenerator.nextBoolean();
 
-                //Set index of left and right fork
-                int left = i;
-                int right = (i + 1) % forks.length;
+      //Try to get the forks
+      if (((rand) ? forks[left].tryLock() : forks[right].tryLock()) &&
+          ((!rand) ? forks[left].tryLock() : forks[right].tryLock())) {
 
-                //Try to get the forks
-                if (forks[left].tryLock() && forks[right].tryLock()) {
+        philosopher.takeAll(i, left, right);
 
-                    philosopher.takeAll(i, left, right);
+        return;
 
-                    return;
+      } else {
+        //Drop forks if held
+        if (forks[left].isHeldByCurrentThread())
+          forks[left].unlock();
 
-                } else {
-                    //Drop fork if held
-                    if(forks[left].isHeldByCurrentThread())
-                        forks[left].unlock();
-
-                    //Stand up
-                    seats[i].unlock();
-                }
-            }
-        }
+        if (forks[right].isHeldByCurrentThread())
+          forks[right].unlock();
+      }
 
     }
 
-    public void leaveSeat(int seatNumber) {
-        //Release forks
-        forks[seatNumber].unlock();
-        forks[(seatNumber + 1) % forks.length].unlock();
-        //Stand up
-        seats[seatNumber].unlock();
-    }
+  }
+
+  public void leaveSeat(int seatNumber) {
+    //Release forks
+    forks[seatNumber].unlock();
+    forks[(seatNumber + 1) % forks.length].unlock();
+
+  }
 }
