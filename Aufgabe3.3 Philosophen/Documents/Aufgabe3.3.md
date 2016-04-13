@@ -99,16 +99,17 @@ Takt:   1.9GHz
 RAM:    4GB
 
 #### Messungs 1 (5, 0, 5)
-| Philosoph | Essvorgänge |
-| --- | --- |
-| P0 | 8930  |
-| P1 | 8932  |
-| P2 | 8941  |
-| P3 | 8941  |
-| P4 | 8943  |
+| Philosoph | Essvorgänge
+| --- | ---
+|	P0	|	5907
+|	P1	|	5928
+|	P2	|	5928
+|	P3	|	5921
+|	P4	|	5931 |
 
-Gesamt:44687
-Durchschnitt:8937
+Gesamtzahl: 29615
+
+Durchschnitt: 5923
 
 #### Messung 2 (30, 0, 30)
 | Philosoph | Essvorgänge | Philosoph | Essvorgänge | Philosophen |Essvorgänge |
