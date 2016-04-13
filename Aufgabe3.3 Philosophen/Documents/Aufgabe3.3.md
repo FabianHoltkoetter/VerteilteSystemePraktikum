@@ -37,8 +37,10 @@ asdf
 Für die Messungen wurde die "View" nicht initialisiert und den Philosophen kein Observer zugeteilt.
 
 ### Maschine 1
-Laptop: Mac Pro
-CPU:    i7-xxxx
+Laptop: MacBook Pro 11.3
+CPU:    i7-4850HQ
+Kerne:  4 (physikalisch) + HT
+Takt:   2.3GHz
 RAM:    16GB
 
 #### Messungs 1 (5, 0, 5)
@@ -92,50 +94,52 @@ Durchschnitt: 852
 ### Maschine 2
 Laptop: Surface Pro 3
 CPU:    i5-4300U
+Kerne:  2 (physikalisch)
+Takt:   1.9GHz
 RAM:    4GB
 
 #### Messungs 1 (5, 0, 5)
 | Philosoph | Essvorgänge |
 | --- | --- |
-| P0 | xxx  |
-| P1 | xxx  |
-| P2 | xxx  |
-| P3 | xxx  |
-| P4 | xxx  |
+| P0 | 8930  |
+| P1 | 8932  |
+| P2 | 8941  |
+| P3 | 8941  |
+| P4 | 8943  |
 
-Gesamt:
-Durchschnitt:
+Gesamt:44687
+Durchschnitt:8937
 
 #### Messung 2 (30, 0, 30)
 | Philosoph | Essvorgänge | Philosoph | Essvorgänge | Philosophen |Essvorgänge |
 | --- | --- | --- | --- | --- | --- |
-| P0  | xxx | P10 | xxx | P20 | xxx |
-| P1  | xxx | P11 | xxx | P21 | --- |
-| P2  | xxx | P12 | xxx | P22 | --- |
-| P3  | xxx | P13 | xxx | P23 | --- |
-| P4  | xxx | P14 | xxx | P24 | --- |
-| P5  | xxx | P15 | xxx | P25 | --- |
-| P6  | xxx | P16 | xxx | P26 | --- |
-| P7  | xxx | P17 | xxx | P27 | --- |
-| P8  | xxx | P18 | xxx | P28 | --- |
-| P9  | xxx | P19 | xxx | P29 | --- |
+| P0  | 3154 | P10 | 3148 | P20 | 3150 |
+| P1  | 3153 | P11 | 3152 | P21 | 3149 |
+| P2  | 3152 | P12 | 3149 | P22 | 3152 |
+| P3  | 3151 | P13 | 3150 | P23 | 3149 |
+| P4  | 3153 | P14 | 3148 | P24 | 3148 |
+| P5  | 3149 | P15 | 3146 | P25 | 3150 |
+| P6  | 3155 | P16 | 3148 | P26 | 3147 |
+| P7  | 3149 | P17 | 3147 | P27 | 3149 |
+| P8  | 3149 | P18 | 3147 | P28 | 3150 |
+| P9  | 3153 | P19 | 3149 | P29 | 3150 |
 
-Gesamt:
-Durchschnitt:
+Gesamt:94496
+Durchschnitt:3149
 
 #### Messung 3 (50, 0, 10) |
 | Philosoph | Essvorgänge | Philosoph | Essvorgänge | Philosophen | Essvorgänge | Philosoph | Essvorgänge | Philosoph | Essvorgänge |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P0  | xxx | P10 | xxx | P20 | xxx | P30 | xxx | P40 | xxx |
-| P1  | xxx | P11 | xxx | P21 | --- | P31 | xxx | P41 | xxx |
-| P2  | xxx | P12 | xxx | P22 | --- | P32 | xxx | P42 | xxx |
-| P3  | xxx | P13 | xxx | P23 | --- | P33 | xxx | P43 | xxx |
-| P4  | xxx | P14 | xxx | P24 | --- | P34 | xxx | P44 | xxx |
-| P5  | xxx | P15 | xxx | P25 | --- | P35 | xxx | P45 | xxx |
-| P6  | xxx | P16 | xxx | P26 | --- | P36 | xxx | P46 | xxx |
-| P7  | xxx | P17 | xxx | P27 | --- | P37 | xxx | P47 | xxx |
-| P8  | xxx | P18 | xxx | P28 | --- | P38 | xxx | P48 | xxx |
-| P9  | xxx | P19 | xxx | P29 | --- | P39 | xxx | P49 | xxx |
+| P0  | 26 | P10 | 30 | P20 | 31 | P30 | 29 | P40 | 29 |
+| P1  | 29 | P11 | 30 | P21 | 31 | P31 | 30 | P41 | 27 |
+| P2  | 29 | P12 | 29 | P22 | 29 | P32 | 30 | P42 | 30 |
+| P3  | 29 | P13 | 29 | P23 | 28 | P33 | 29 | P43 | 28 |
+| P4  | 31 | P14 | 30 | P24 | 29 | P34 | 29 | P44 | 28 |
+| P5  | 29 | P15 | 31 | P25 | 29 | P35 | 28 | P45 | 27 |
+| P6  | 29 | P16 | 29 | P26 | 29 | P36 | 31 | P46 | 29 |
+| P7  | 31 | P17 | 25 | P27 | 29 | P37 | 28 | P47 | 28 |
+| P8  | 29 | P18 | 29 | P28 | 29 | P38 | 30 | P48 | 31 |
+| P9  | 30 | P19 | 29 | P29 | 31 | P39 | 30 | P49 | 31 |
 
-Gesamt:
-Durchschnitt:
+Gesamt:1460
+Durchschnitt:29
