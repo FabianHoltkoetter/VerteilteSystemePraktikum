@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DiningTable {
 
-  private ReentrantLock[] forks;
+  private final ReentrantLock[] forks;
   private Random rGenerator = new Random();
 
   public DiningTable(int seats) {
@@ -24,41 +24,54 @@ public class DiningTable {
     }
   }
 
-  public void takeSeat(Philosopher philosopher) {
+  public void takeSeat(Philosopher philosopher) throws InterruptedException {
 
-    //Philosopher runs around the table till he got a seat + forks
-    for (int i = 0; ; i = (i + 1) % forks.length) {
+    while (!Thread.currentThread().isInterrupted()) {
 
-      //Set index of left and right fork
-      int left = i;
-      int right = (i + 1) % forks.length;
-      boolean rand = rGenerator.nextBoolean();
+      //Philosopher runs around the table till he got a seat + forks
+      for (int i = 0; i < forks.length; i++) {
 
-      //Try to get the forks
-      if (((rand) ? forks[left].tryLock() : forks[right].tryLock()) &&
-          ((!rand) ? forks[left].tryLock() : forks[right].tryLock())) {
+        //Set index of left and right fork
+        int left = i;
+        int right = (i + 1) % forks.length;
+        boolean rand = rGenerator.nextBoolean();
 
-        philosopher.takeAll(left, right);
+        //Try to get the forks
+        if (((rand) ? forks[left].tryLock() : forks[right].tryLock()) &&
+            ((!rand) ? forks[left].tryLock() : forks[right].tryLock())) {
 
-        return;
+          philosopher.takeAll(left, right);
 
-      } else {
-        //Drop forks if held
-        if (forks[left].isHeldByCurrentThread())
-          forks[left].unlock();
+          return;
 
-        if (forks[right].isHeldByCurrentThread())
-          forks[right].unlock();
+        } else {
+          //Drop forks if held
+          if (forks[left].isHeldByCurrentThread())
+            forks[left].unlock();
+
+          if (forks[right].isHeldByCurrentThread())
+            forks[right].unlock();
+        }
+
       }
 
+      //Wait till a seat gets free
+      synchronized (forks){
+          forks.wait();
+      }
     }
-
   }
 
   public void leaveSeat(int seatNumber) {
     //Release forks
     forks[seatNumber].unlock();
     forks[(seatNumber + 1) % forks.length].unlock();
+
+    //Notify Waiting philosophers
+    synchronized (forks) {
+      forks.notify();
+    }
+
 
   }
 }
