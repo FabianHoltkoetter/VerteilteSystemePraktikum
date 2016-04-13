@@ -16,7 +16,7 @@ public class Restaurant {
     public static final int RUN_TIME = 60 * 1000;
 
     public static void main(String[] args){
-        if (args.length != 3) {
+        if (args.length != 3 && args.length != 4) {
             throw new IllegalArgumentException(ERROR_PARAMETERS);
         }
 
@@ -24,10 +24,14 @@ public class Restaurant {
         int philosophersCount;
         int hungryPhilosophersCount;
         int seatCount;
+        boolean viewActive = false;
         try {
             philosophersCount = Integer.parseInt(args[0]);
             hungryPhilosophersCount = Integer.parseInt(args[1]);
             seatCount = Integer.parseInt(args[2]);
+            if(args.length == 4){
+                viewActive = Boolean.parseBoolean(args[3]);
+            }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(ERROR_PARAMETERS);
         }
@@ -37,16 +41,19 @@ public class Restaurant {
         List<Philosopher> philosophers = new ArrayList<>();
         TableMaster master = new TableMaster();
         View view = new View();
-        //view.start();
+        if(viewActive)
+            view.start();
 
         //Hold threads
         List<Thread> threadList = new ArrayList<>();
         threadList.add(master);
-        //threadList.add(view);
+        if(viewActive)
+            threadList.add(view);
 
         for(int i = 0; i < philosophersCount; i++) {
             Philosopher philosopher = new Philosopher(i, table, i < hungryPhilosophersCount);
-            //philosopher.addObserver(view);
+            if(viewActive)
+                philosopher.addObserver(view);
 
             master.addPhilosopher(philosopher);
             philosophers.add(philosopher);
