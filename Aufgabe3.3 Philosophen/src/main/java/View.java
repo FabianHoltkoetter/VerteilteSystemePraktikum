@@ -39,7 +39,7 @@ public class View extends Thread implements Observer{
         try {
             queue.put(builder.toString());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            return;
         }
     }
 

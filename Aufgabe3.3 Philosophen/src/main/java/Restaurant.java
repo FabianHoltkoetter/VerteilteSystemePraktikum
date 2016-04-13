@@ -13,7 +13,7 @@ import java.util.List;
 public class Restaurant {
     private static final String ERROR_PARAMETERS = "Please specify the numbers of how many philosophers and seats you want to start.";
 
-    public static final int RUN_TIME = 10 * 1000;
+    public static final int RUN_TIME = 60 * 1000;
 
     public static void main(String[] args){
         if (args.length != 3) {
@@ -37,16 +37,16 @@ public class Restaurant {
         List<Philosopher> philosophers = new ArrayList<>();
         TableMaster master = new TableMaster();
         View view = new View();
-        view.start();
+        //view.start();
 
         //Hold threads
         List<Thread> threadList = new ArrayList<>();
         threadList.add(master);
-        threadList.add(view);
+        //threadList.add(view);
 
         for(int i = 0; i < philosophersCount; i++) {
             Philosopher philosopher = new Philosopher(i, table, i < hungryPhilosophersCount);
-            philosopher.addObserver(view);
+            //philosopher.addObserver(view);
 
             master.addPhilosopher(philosopher);
             philosophers.add(philosopher);
@@ -66,7 +66,13 @@ public class Restaurant {
 
         threadList.forEach(Thread::interrupt);
 
-        philosophers.forEach(System.out::println);
+        long mealCount = philosophers.stream()
+            .peek(System.out::println)
+            .mapToInt(Philosopher::getEatCounter)
+            .sum();
+
+        System.out.println("Gesamtzahl: " + mealCount);
+        System.out.println("Durchschnitt: " + mealCount/philosophers.size());
 
     }
 
