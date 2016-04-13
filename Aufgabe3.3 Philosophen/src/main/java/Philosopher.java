@@ -81,7 +81,7 @@ public class Philosopher extends Observable implements Runnable {
                 diningTable.leaveSeat(seatBuffer);
 
 
-                if (eatCounter == MEALS_BEFORE_SLEEP) {
+                if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
                     //Sleep after eatCount meals
                     try {
                         Thread.sleep(SLEEP_TIME);
