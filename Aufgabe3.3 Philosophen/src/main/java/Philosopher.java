@@ -17,6 +17,7 @@ public class Philosopher extends Observable implements Runnable {
     public static final int SLEEP_TIME = 10;
 
     public final String PREFIX;
+    public final int id;
     public boolean allowedToEat = true;
 
     private final DiningTable diningTable;
@@ -31,6 +32,7 @@ public class Philosopher extends Observable implements Runnable {
     public Philosopher(int id, DiningTable diningTable, boolean hungry) {
 
         this.diningTable = diningTable;
+        this.id = id;
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < id; i++)
@@ -48,13 +50,13 @@ public class Philosopher extends Observable implements Runnable {
     public void run() {
         int seatBuffer;
 
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
 
             try {
                 // Meditate
                 Thread.sleep(meditationTime);
             } catch (InterruptedException e) {
-                throw new AssertionError(PREFIX + " got interrupted while eating.");
+                break;
 
             }
 
@@ -68,7 +70,7 @@ public class Philosopher extends Observable implements Runnable {
                     Thread.sleep(EAT_TIME);
                     setEatCounter(getEatCounter() + 1);
                 } catch (InterruptedException e) {
-                    throw new AssertionError(PREFIX + " got interrupted while eating.");
+                    break;
 
                 }
 
@@ -84,7 +86,7 @@ public class Philosopher extends Observable implements Runnable {
                     try {
                         Thread.sleep(SLEEP_TIME);
                     } catch (InterruptedException e) {
-                        throw new AssertionError(PREFIX + " got interrupted while eating.");
+                        break;
                     }
                 }
             }
@@ -137,7 +139,7 @@ public class Philosopher extends Observable implements Runnable {
         this.rightForkNumber = rightForkNumber;
     }
 
-    public synchronized int getEatCounter() {
+    public int getEatCounter() {
         return eatCounter;
     }
 
@@ -145,11 +147,16 @@ public class Philosopher extends Observable implements Runnable {
         this.eatCounter = eatCounter;
     }
 
-    public synchronized boolean isAllowedToEat() {
+    public boolean isAllowedToEat() {
         return allowedToEat;
     }
 
     public synchronized void setAllowedToEat(boolean allowedToEat) {
         this.allowedToEat = allowedToEat;
+    }
+
+    @Override
+    public String toString() {
+        return "Philosopher " + id + " got " + getEatCounter() + " meals";
     }
 }

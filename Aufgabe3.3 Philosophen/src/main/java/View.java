@@ -46,11 +46,11 @@ public class View extends Thread implements Observer{
     @Override
     public void run(){
 
-        while (true)
+        while (!isInterrupted())
             try {
                 System.out.println(queue.take());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                break;
             }
 
     }

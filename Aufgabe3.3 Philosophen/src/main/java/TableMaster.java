@@ -19,7 +19,7 @@ public class TableMaster extends Thread {
 
     @Override
     public void run() {
-        while (true){
+        while (!isInterrupted()){
             //Calculate average eat count
             childs.forEach(philosopher ->
                 avgEatCout += philosopher.getEatCounter()
@@ -34,7 +34,7 @@ public class TableMaster extends Thread {
             try {
                 Thread.sleep(PAUSE);
             } catch (InterruptedException e) {
-                throw new AssertionError("Table Master got interrupted -> Dont do that");
+                break;
             }
         }
     }
