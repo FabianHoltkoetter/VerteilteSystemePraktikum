@@ -38,7 +38,7 @@ public class DiningTable {
       if (((rand) ? forks[left].tryLock() : forks[right].tryLock()) &&
           ((!rand) ? forks[left].tryLock() : forks[right].tryLock())) {
 
-        philosopher.takeAll(i, left, right);
+        philosopher.takeAll(left, right);
 
         return;
 

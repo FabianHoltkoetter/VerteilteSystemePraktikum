@@ -22,7 +22,6 @@ public class Philosopher extends Observable implements Runnable {
 
     private final DiningTable diningTable;
 
-    private int seatNumber = -1;
     private int leftForkNumber = -1;
     private int rightForkNumber = -1;
     private int eatCounter = 0;
@@ -76,7 +75,7 @@ public class Philosopher extends Observable implements Runnable {
 
 
                 //Leave table
-                seatBuffer = getSeatNumber();
+                seatBuffer = getLeftForkNumber();
                 releaseAll();
                 diningTable.leaveSeat(seatBuffer);
 
@@ -95,12 +94,10 @@ public class Philosopher extends Observable implements Runnable {
 
     public boolean isEating(){
         return getLeftForkNumber() >= 0 &&
-                getRightForkNumber() >= 0 &&
-                getSeatNumber() >= 0;
+                getRightForkNumber() >= 0;
     }
 
-    public void takeAll(int seatNumber, int leftForkNumber, int rightForkNumber){
-        setSeatNumber(seatNumber);
+    public void takeAll(int leftForkNumber, int rightForkNumber){
         setLeftForkNumber(leftForkNumber);
         setRightForkNumber(rightForkNumber);
         setChanged();
@@ -108,19 +105,10 @@ public class Philosopher extends Observable implements Runnable {
     }
 
     private void releaseAll(){
-        setSeatNumber(-1);
         setLeftForkNumber(-1);
         setRightForkNumber(-1);
         setChanged();
         notifyObservers();
-    }
-
-    public int getSeatNumber() {
-        return seatNumber;
-    }
-
-    public void setSeatNumber(int seatNumber) {
-        this.seatNumber = seatNumber;
     }
 
     public int getLeftForkNumber() {
