@@ -25,8 +25,6 @@ public class View extends Thread implements Observer{
         if(philosopher.isEating())
             builder.append("\tGabel links: ")
                     .append(philosopher.getLeftForkNumber())
-                    .append("\tSitz: ")
-                    .append(philosopher.getSeatNumber())
                     .append("\tGabel rechts: ")
                     .append(philosopher.getRightForkNumber())
                     .append("\t Gegessen: ")
