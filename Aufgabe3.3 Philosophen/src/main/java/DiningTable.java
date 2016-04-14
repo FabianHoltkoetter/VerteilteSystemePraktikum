@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -13,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DiningTable {
 
   private final ReentrantLock[] forks;
-  private Random rGenerator = new Random();
+  private Random rGenerator = ThreadLocalRandom.current();
 
   public DiningTable(int seats) {
 
@@ -28,7 +29,7 @@ public class DiningTable {
 
     while (!Thread.currentThread().isInterrupted()) {
 
-      //Philosopher runs around the table till he got a seat + forks
+      //Philosopher runs around the table till and searches for free forks
       for (int i = 0; i < forks.length; i++) {
 
         //Set index of left and right fork
