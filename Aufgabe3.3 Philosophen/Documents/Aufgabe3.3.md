@@ -25,6 +25,8 @@ Eine Gabel entspricht einem Java ReentrantLock.
 ### Welche Prozesse/Threads müssen realisiert werden?
 
 Jeder Philosoph entspricht einem Thread.
+Zusätzlich der Hauptthread, der für die Initialisierung sorgt und nach einer vorkonfigurierten Zeit das Programm anhält
+und evtl Ergebnisse auswertet.
 
 ### Wie kann eine maximale Parallelität der abläufe erreicht werden?
 
@@ -32,13 +34,15 @@ Möglichst wenig blockierung und möglichst kleine synchronized-Blöcke.
 
 ### Wie muss eine Synchronisation erfolgen?
 
-Das greifen der Gabeln
+Das greifen der Gabeln wird synchronisiert.
 
 ### Kann es zu einem Deadlock kommen? Kann dieser vermieden oder erkannt und beseitigt werden?
 
-Wenn die Anzahl an Plätzen der Anzahl an Philosophen entspricht, kann es passieren, dass jeder Philosoph seine linke Gabel bestitzt und auf die rechte Gabel wartet,
+Wenn die Anzahl an Plätzen kleiner gleich der Anzahl an Philosophen ist, kann es passieren, dass jeder sitzende Philosoph seine linke Gabel besitzt und auf die rechte Gabel wartet,
 ohne sie je zu erhalten.
-In dieser Implementierung wird dieses Problem dadurch gelöst, dass ein Philosoph sich erst setzt wenn er sieht, dass zwei Gabeln für ihn zu verügung stehen.
+In dieser Implementierung wird dieses Problem dadurch gelöst, da ein Philosoph sich erst setzt,
+wenn er sieht, dass zwei Gabeln für ihn zu verügung stehen und sollte ihm die zweite Gabel nicht zur verfügung stehen,
+gibt er die erste wieder frei.
 
 ## e) Testmessungen
 
