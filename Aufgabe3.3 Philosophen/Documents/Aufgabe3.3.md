@@ -6,11 +6,17 @@
 
 #### Philosophen
 
-Ein Philosoph besitzt Referenzen auf eine linke Gabel und eine rechte Gabel (jeweils ein ReentrantLock). Er selbst läuft in einer dauerschleife. Die Schleife beginnt mit der Meditation (sleep), darauf folgt der Gang zum Tisch. Dort wartet der Philosoph bis ein Platz frei wird. Hat der Philosoph den Platz im Array eingenommen versucht er die linke und rechte Gabel zu bekommen. Sobald er beide erhalten hat isst er (sleep). Ist er mit essen fertig gibt er beide Gabeln wieder frei, die Refernz aus dem Platz-Array wird entfernt und der Philosoph beginnt seine Schleife von vorn.
+Ein Philosoph weiß an welcher Stelle er am Tisch sitzt.
+Er selbst läuft in einer dauerschleife. Die Schleife beginnt mit der Meditation (sleep), darauf folgt der Gang zum Tisch.
+Dort sucht der Philosoph nach einem Platz mit zwei freien Gabeln.
+Wenn er einen solchen Platz nicht findet, wartet er bis ein momentan speisender Philosoph aufsteht.
+Hat der Philosoph einen solchen Platz gefunden, wir ihm seine Sitznummer übergeben und die rechte und linke Gabel werden gelockt. Anschließend isst der Philosoph.
+Ist er mit essen fertig, gibt er beide Gabeln wieder frei, es wird überprüft ob er seine maximale Anzahl an Mahlzeiten erreicht hat und schläft, bzw beginnt die Schleife
+von vorn.
 
 #### Tisch
 
-Ein Tisch besteht aus einem privaten Array aus Plätzen. Wenn ein Philosoph mit dem meditieren fertig ist und an den Tisch kehren möchte, kann er über einen Methodenaufruf einen Platz einnehmen. Ist aktuell kein Platz frei, muss der Philosoph warten.
+Ein Tisch besteht aus einem Array von Gabeln. Die Platzposition  entspricht der Position der linken Gabel.
 
 #### Gabeln
 
@@ -22,15 +28,17 @@ Jeder Philosoph entspricht einem Thread.
 
 ### Wie kann eine maximale Parallelität der abläufe erreicht werden?
 
-asdf
+Möglichst wenig blockierung und möglichst kleine synchronized-Blöcke.
 
 ### Wie muss eine Synchronisation erfolgen?
 
-Die Philosophen müssen sich auf den Tisch synchronosieren. Die Synchronisation des Zugriffs auf die Gabeln erfolgt automatisch dadurch, dass eine Gabel ein ReentrantLock ist.
+Das greifen der Gabeln
 
 ### Kann es zu einem Deadlock kommen? Kann dieser vermieden oder erkannt und beseitigt werden?
 
-asdf
+Wenn die Anzahl an Plätzen der Anzahl an Philosophen entspricht, kann es passieren, dass jeder Philosoph seine linke Gabel bestitzt und auf die rechte Gabel wartet,
+ohne sie je zu erhalten.
+In dieser Implementierung wird dieses Problem dadurch gelöst, dass ein Philosoph sich erst setzt wenn er sieht, dass zwei Gabeln für ihn zu verügung stehen.
 
 ## e) Testmessungen
 
