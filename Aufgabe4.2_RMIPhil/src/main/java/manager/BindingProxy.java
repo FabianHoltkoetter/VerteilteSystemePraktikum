@@ -1,12 +1,14 @@
-package server;
+package manager;
 
-import api.Manager;
+import api.BindingProxyInterface;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Organization: HM FK07.
@@ -17,8 +19,10 @@ import java.rmi.server.UnicastRemoteObject;
  * Java-Version: 1.8
  * System: 2,3 GHz Intel Core i7, 16 GB 1600 MHz DDR3
  */
-public class ManagerThing implements Manager {
-  public ManagerThing() {
+public class BindingProxy implements BindingProxyInterface {
+  private static final Logger LOG = Logger.getLogger(BindingProxy.class.getName());
+
+  public BindingProxy() {
     super();
   }
 
@@ -27,12 +31,12 @@ public class ManagerThing implements Manager {
       System.setSecurityManager(new SecurityManager());
     }
     try {
-      Manager stub = (Manager) UnicastRemoteObject.exportObject(new ManagerThing(), 0);
+      BindingProxyInterface stub = (BindingProxyInterface) UnicastRemoteObject.exportObject(new BindingProxy(), 0);
       Registry registry = LocateRegistry.getRegistry();
-      registry.rebind("manager", stub);
-      System.out.println("manager bound");
+      registry.rebind(BindingProxyInterface.NAME, stub);
+      LOG.log(Level.INFO, "BindingProxy bound to registry.");
     } catch (Exception e) {
-      System.err.println("exception:");
+      LOG.log(Level.SEVERE, "exception:");
       e.printStackTrace();
     }
   }
@@ -40,8 +44,10 @@ public class ManagerThing implements Manager {
   public void proxyRebind(String name, Remote object) throws RemoteException {
     try {
       Registry registry = LocateRegistry.getRegistry();
-      registry.bind(name, object);
+      registry.rebind(name, object);
+      LOG.log(Level.INFO, "Bound " + name + " to registry." );
     } catch (Exception e) {
+      LOG.log(Level.SEVERE, name + " was not bound!");
       e.printStackTrace();
     }
   }
