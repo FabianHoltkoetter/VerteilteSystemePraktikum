@@ -29,8 +29,7 @@ public class ManagerThing implements Manager {
     try {
       Manager stub = (Manager) UnicastRemoteObject.exportObject(new ManagerThing(), 0);
       Registry registry = LocateRegistry.getRegistry();
-      server.ManagerThing manager = (ManagerThing) registry.lookup("manager");
-      manager.proxyRebind("manager", stub);
+      registry.rebind("manager", stub);
       System.out.println("manager bound");
     } catch (Exception e) {
       System.err.println("exception:");
