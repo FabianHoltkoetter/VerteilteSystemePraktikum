@@ -1,7 +1,5 @@
 package manager;
 
-import api.BindingProxyInterface;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,10 +17,10 @@ import java.util.logging.Logger;
  * Java-Version: 1.8
  * System: 2,3 GHz Intel Core i7, 16 GB 1600 MHz DDR3
  */
-public class BindingProxy implements BindingProxyInterface {
-  private static final Logger LOG = Logger.getLogger(BindingProxy.class.getName());
+public class BindingProxyImpl implements api.BindingProxy {
+  private static final Logger LOG = Logger.getLogger(BindingProxyImpl.class.getName());
 
-  public BindingProxy() {
+  public BindingProxyImpl() {
     super();
   }
 
@@ -31,15 +29,16 @@ public class BindingProxy implements BindingProxyInterface {
       System.setSecurityManager(new SecurityManager());
     }
     try {
-      BindingProxyInterface stub = (BindingProxyInterface) UnicastRemoteObject.exportObject(new BindingProxy(), 0);
+      api.BindingProxy stub = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
       Registry registry = LocateRegistry.getRegistry();
-      registry.rebind(BindingProxyInterface.NAME, stub);
-      LOG.log(Level.INFO, "BindingProxy bound to registry.");
+      registry.rebind(api.BindingProxy.NAME, stub);
+      LOG.log(Level.INFO, "BindingProxyImpl bound to registry.");
     } catch (Exception e) {
-      LOG.log(Level.SEVERE, "exception:");
+      LOG.log(Level.SEVERE, "Exception while binding BindingProxyImpl");
       e.printStackTrace();
     }
   }
+
   @Override
   public void proxyRebind(String name, Remote object) throws RemoteException {
     try {
