@@ -26,15 +26,39 @@ public class ManagerImpl implements api.Manager {
     }
 
     @Override
-    public void registerTablepart(String uid) {
+    public synchronized void registerTablepart(String uid) {
         LOG.info(String.format("Adding TablePart %s", uid));
         tableIds.add(uid);
     }
 
     @Override
-    public void registerPhilosopher(String uid) {
+    public synchronized void unregisterTablepart(String uid) {
+        LOG.info(String.format("Remove TablePart %s", uid));
+        try {
+            tableIds.remove(uid);
+            registry.unbind(uid);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            LOG.severe("Error while removing dead TablePart or already removed");
+        }
+    }
+
+    @Override
+    public synchronized void registerPhilosopher(String uid) {
         LOG.info(String.format("Adding Philosopher %s", uid));
         philosopherIds.add(uid);
+    }
+
+    @Override
+    public synchronized void unregisterPhilosopher(String uid) {
+        LOG.info(String.format("Remove Philosopher %s", uid));
+        try {
+            philosopherIds.remove(uid);
+            registry.unbind(uid);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            LOG.severe("Error while removing Philosopher or already removed");
+        }
     }
 
     @Override
@@ -54,15 +78,7 @@ public class ManagerImpl implements api.Manager {
         }).filter(r -> r != null).collect(Collectors.toList());
 
         //Remove all illegal Philosophers
-        philosopherIds.removeAll(illegalPhilosophers);
-        illegalPhilosophers.forEach(philosopher -> {
-            try {
-                registry.unbind(philosopher);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                LOG.severe("Error while removing dead Philosopher or already removed");
-            }
-        });
+       illegalPhilosophers.forEach(this::unregisterPhilosopher);
 
         return philosophers;
     }
@@ -81,12 +97,7 @@ public class ManagerImpl implements api.Manager {
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
-                try {
-                    registry.unbind(tableIds.remove(index));
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                    LOG.severe("Error while removing dead TablePart or already removed");
-                }
+                unregisterTablepart(tableIds.get(index));
 
                 if (index == tableIds.size()) {
                     index = 0;
@@ -110,12 +121,7 @@ public class ManagerImpl implements api.Manager {
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
-                try {
-                    registry.unbind(tableIds.remove(index));
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                    LOG.severe("Error while removing dead TablePart or already removed");
-                }
+                unregisterTablepart(tableIds.get(index));
 
                 index = randomGenerator.nextInt(tableIds.size());
             }

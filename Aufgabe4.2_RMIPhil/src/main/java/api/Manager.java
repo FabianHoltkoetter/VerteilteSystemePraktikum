@@ -21,11 +21,25 @@ public interface Manager extends Remote {
     public void registerTablepart(String uid) throws RemoteException;
 
     /**
+     * Unregisters a {@link TablePart} in the restaurant
+     *
+     * @param uid The uid of the @{@link TablePart} to be removed
+     */
+    public void unregisterTablepart(String uid) throws RemoteException;
+
+    /**
      * Registers a {@link Philosopher} in the restaurant
      *
      * @param uid The uid with which the {@link Philosopher} is stored in the RMI
      */
     public void registerPhilosopher(String uid) throws RemoteException;
+
+    /**
+     * Unregisters a {@link Philosopher} in the restaurant
+     *
+     * @param uid The uid of the @{@link Philosopher} to be removed
+     */
+    public void unregisterPhilosopher(String uid) throws RemoteException;
 
     /**
      * Get all registered {@link Philosopher}
