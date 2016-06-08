@@ -66,6 +66,9 @@ public class TablePartImpl implements TablePart {
 
     //Try to get both forks
     if(takeLeftFork(uuid) && takeRightFork(uuid)){
+
+      LOG.log(Level.INFO, String.format("Got both forks on TablePart %s.", id));
+
       result.put(this, 0);
       result.put(this, 1);
       return result;
@@ -73,11 +76,17 @@ public class TablePartImpl implements TablePart {
     } else {
       //Dont got both forks, free and move further
       leftFork.unblock();
+      LOG.log(Level.INFO, String.format("Dont got both forks on TablePart %s.", id));
 
       //Try to get right fork and left fork of next TP
       if(takeRightFork(uuid)){
 
+        LOG.log(Level.INFO, String.format("Got right fork on TablePart %s.", id));
+
         if(nextTablePart.takeLeftFork(uuid)){
+
+          LOG.log(Level.INFO, String.format("Got left fork on TablePart %s.", nextTablePart.getId()));
+
           result.put(this, 1);
           result.put(nextTablePart, 0);
           return result;
@@ -88,6 +97,8 @@ public class TablePartImpl implements TablePart {
 
     }
 
+
+    LOG.log(Level.INFO, String.format("Got no forks on TablePart %s.", id));
     result.put(nextTablePart, null);
     return result;
   }
