@@ -1,5 +1,6 @@
 package philosopher;
 
+import api.BindingProxy;
 import api.Manager;
 import api.Philosopher;
 import api.TablePart;
@@ -24,7 +25,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
     public static final int EAT_TIME = 1;
     public static final int SLEEP_TIME = 10;
 
-    private final String ID = UUID.randomUUID().toString();
+    private final String id = UUID.randomUUID().toString();
     private final Manager manager;
 
     public boolean allowedToEat = true;
@@ -39,13 +40,13 @@ public class PhilosopherImpl implements Philosopher, Runnable {
         try {
             Philosopher stub = (Philosopher) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.getRegistry(ip);
-            registry.rebind(ID, stub);
-            LOG.log(Level.INFO, String.format("Philosopher %s bound to registry.", ID));
+            ((BindingProxy) registry.lookup(BindingProxy.NAME)).proxyRebind(id, this);
+            LOG.info(String.format("Philosopher %s bound to registry.", id));
             manager = (Manager) registry.lookup(Manager.NAME);
-            manager.registerPhilosopher(ID);
-            LOG.log(Level.INFO, String.format("Philosopher %s registered in manager.", ID));
+            manager.registerPhilosopher(id);
+            LOG.info(String.format("Philosopher %s registered in manager.", id));
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, String.format("Problem binding Philosopher %s.", ID));
+            LOG.severe(String.format("Problem binding Philosopher %s.", id));
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -64,13 +65,13 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     // Go to table
                     Map<TablePart, Integer> forkIndices;
                     TablePart randomTablePart = manager.getRandomTablePart();
-                    LOG.log(Level.INFO, String.format("Philosopher %s got TablePart %s", ID, randomTablePart.getId()));
-                    forkIndices = randomTablePart.takeSeat(ID);
+                    LOG.info(String.format("Philosopher %s got TablePart %s", id, randomTablePart.getId()));
+                    forkIndices = randomTablePart.takeSeat(id);
                     while (forkIndices.keySet().size() != 2) {
                         randomTablePart = forkIndices.keySet().iterator().next();
-                        forkIndices = randomTablePart.takeSeat(ID);
+                        forkIndices = randomTablePart.takeSeat(id);
                     }
-                    LOG.log(Level.INFO, String.format("Philosopher %s took seat.", ID));
+                    LOG.info(String.format("Philosopher %s took seat.", id));
 
                     // Eat
                     Thread.sleep(EAT_TIME);
@@ -82,7 +83,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                         tablePart.leaveSeat(forkIndex);
                       } catch (RemoteException e) {
                         e.printStackTrace();
-                        LOG.log(Level.SEVERE, "Error in leaveSeat on TP");
+                        LOG.severe("Error in leaveSeat on TP");
                       }
                     });
 
@@ -94,12 +95,12 @@ public class PhilosopherImpl implements Philosopher, Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.log(Level.SEVERE, String.format("Error in run of Philosopher %s", ID));
+            LOG.severe(String.format("Error in run of Philosopher %s", id));
         }
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
     }
 
     public int getEatCounter() {

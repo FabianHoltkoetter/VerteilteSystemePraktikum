@@ -32,9 +32,9 @@ public class ManagerImpl implements api.Manager {
             Manager stub = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(), 0);
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(Manager.NAME, stub);
-            LOG.log(Level.INFO, "ManagerImpl bound to registry.");
+            LOG.info("ManagerImpl bound to registry.");
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Exception while binding Manager.");
+            LOG.severe("Exception while binding Manager.");
             e.printStackTrace();
         }
     }
@@ -68,7 +68,7 @@ public class ManagerImpl implements api.Manager {
             } catch (Exception e) {
                 illegalPhilosophers.add(s);
                 e.printStackTrace();
-                LOG.log(Level.SEVERE, String.format("Philosopher %s  not found. Removing from active philosophers.", s));
+                LOG.severe(String.format("Philosopher %s  not found. Removing from active philosophers.", s));
             }
             return null;
         }).filter(r -> r != null).collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class ManagerImpl implements api.Manager {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
             } catch (Exception e) {
                 e.printStackTrace();
-                LOG.log(Level.SEVERE, String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
+                LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
                 tableIds.remove(index);
                 if (index >= tableIds.size() - 1) {
                     index = 0;
@@ -106,7 +106,7 @@ public class ManagerImpl implements api.Manager {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
             } catch (Exception e) {
                 e.printStackTrace();
-                LOG.log(Level.SEVERE, String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
+                LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
                 tableIds.remove(index);
                 index = randomGenerator.nextInt(tableIds.size());
             }

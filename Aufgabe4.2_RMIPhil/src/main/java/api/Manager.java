@@ -1,6 +1,7 @@
 package api;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
 /**
@@ -17,21 +18,21 @@ public interface Manager extends Remote {
      *
      * @param uid The uid with which the @{@link TablePart} is stored in the RMI
      */
-    public void registerTablepart(String uid);
+    public void registerTablepart(String uid) throws RemoteException;
 
     /**
      * Registers a {@link Philosopher} in the restaurant
      *
      * @param uid The uid with which the {@link Philosopher} is stored in the RMI
      */
-    public void registerPhilosopher(String uid);
+    public void registerPhilosopher(String uid) throws RemoteException;
 
     /**
      * Get all registered {@link Philosopher}
      *
      * @return List of all registered {@link Philosopher}
      */
-    public List<Philosopher> getPhilosophers();
+    public List<Philosopher> getPhilosophers() throws RemoteException;
 
     /**
      * Returns the next tablepart. To be used by {@link TablePart} to "close" the table.
@@ -39,12 +40,12 @@ public interface Manager extends Remote {
      * @param myUid The UID of this table.
      * @return The next table.
      */
-    public TablePart getNextTablePart(String myUid);
+    public TablePart getNextTablePart(String myUid) throws RemoteException;
 
     /**
      * Returns a random table part. To be used by {@link Philosopher} to get the first table part to look for a free seat.
      *
      * @return A random table part.
      */
-    public TablePart getRandomTablePart();
+    public TablePart getRandomTablePart() throws RemoteException;
 }
