@@ -24,32 +24,32 @@ public class ManagerController {
   private static Manager manager;
 
   public static void main(String[] args) {
-      // Init Manager and Binder
-      if (System.getSecurityManager() == null) {
-        System.setSecurityManager(new SecurityManager());
-      }
-      try {
-        Registry registry = LocateRegistry.getRegistry();
+    // Init Manager and Binder
+    if (System.getSecurityManager() == null) {
+      System.setSecurityManager(new SecurityManager());
+    }
+    try {
+      Registry registry = LocateRegistry.getRegistry();
 
-        manager = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(registry), 0);
-        BindingProxy binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
+      manager = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(registry), 0);
+      BindingProxy binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
 
-        registry.rebind(Manager.NAME, manager);
-        registry.rebind(BindingProxy.NAME, binder);
+      registry.rebind(Manager.NAME, manager);
+      registry.rebind(BindingProxy.NAME, binder);
 
-        LOG.info("Manager and Binder bound to registry.");
-      } catch (Exception e) {
-        LOG.severe("Exception while binding Manager/Binder.");
-        e.printStackTrace();
-      }
+      LOG.info("Manager and Binder bound to registry.");
+    } catch (Exception e) {
+      LOG.severe("Exception while binding Manager/Binder.");
+      e.printStackTrace();
+    }
 
 
-      //Controll Loop to take actions from console
-      while (!Thread.interrupted()) {
-        //Read input
+    //Controll Loop to take actions from console
+    while (!Thread.interrupted()) {
+      //Read input
 
-        //Process input
+      //Process input
 
-      }
+    }
   }
 }

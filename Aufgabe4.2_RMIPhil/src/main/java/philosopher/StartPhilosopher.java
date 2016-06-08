@@ -1,5 +1,7 @@
 package philosopher;
 
+import Recovery.RecoveryImpl;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,18 +10,23 @@ import java.util.logging.Logger;
  */
 public class StartPhilosopher {
 
-    private static final Logger LOG = Logger.getLogger(StartPhilosopher.class.getName());
+  private static final Logger LOG = Logger.getLogger(StartPhilosopher.class.getName());
 
 
-    public static void main(String[] args) {
+  public static void main(String[] args) {
 
-        if(args.length == 1) {
+    if (args.length == 1) {
 
-            PhilosopherImpl p  = new PhilosopherImpl(args[0]);
-            new Thread(p).start();
+      String ip = args[0];
 
-        } else {
-            LOG.log(Level.INFO, "No IP provided in args");
-        }
+      PhilosopherImpl p = new PhilosopherImpl(ip);
+      new Thread(p).start();
+
+
+      RecoveryImpl.startRecovery(ip);
+
+    } else {
+      LOG.log(Level.INFO, "No IP provided in args");
     }
+  }
 }
