@@ -84,12 +84,15 @@ public class TablePartImpl implements TablePart {
 
         LOG.log(Level.INFO, String.format("Got right fork on TablePart %s.", id));
 
-        if(nextTablePart.takeLeftFork(uuid)){
+        //Cache locally to prevent failure on nextTablePart change
+        TablePart nextTP = nextTablePart;
 
-          LOG.log(Level.INFO, String.format("Got left fork on TablePart %s.", nextTablePart.getId()));
+        if(nextTP.takeLeftFork(uuid)){
+
+          LOG.log(Level.INFO, String.format("Got left fork on TablePart %s.", nextTP.getId()));
 
           result.put(1, this);
-          result.put(0, nextTablePart);
+          result.put(0, nextTP);
           LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
           return result;
         } else {

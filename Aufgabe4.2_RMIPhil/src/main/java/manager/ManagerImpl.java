@@ -1,18 +1,14 @@
 package manager;
 
-import api.Manager;
 import api.Philosopher;
 import api.TablePart;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -24,21 +20,6 @@ public class ManagerImpl implements api.Manager {
     private final Registry registry;
     private List<String> philosopherIds = new ArrayList<>();
     private List<String> tableIds = new ArrayList<>();
-
-    public static void main(String[] args) {
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
-        try {
-            Manager stub = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(), 0);
-            Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(Manager.NAME, stub);
-            LOG.info("ManagerImpl bound to registry.");
-        } catch (Exception e) {
-            LOG.severe("Exception while binding Manager.");
-            e.printStackTrace();
-        }
-    }
 
     public ManagerImpl() {
         super();
