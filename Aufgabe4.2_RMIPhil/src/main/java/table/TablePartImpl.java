@@ -120,6 +120,8 @@ public class TablePartImpl implements TablePart {
         break;
       case 1: rightFork.unblock();
         break;
+      default:
+        LOG.log(Level.INFO, "Wrong Seat Number");
     }
   }
 
