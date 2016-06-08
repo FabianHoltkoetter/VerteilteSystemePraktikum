@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public interface TablePart extends Remote {
   String getId() throws RemoteException;
+  void setNextTablePart(TablePart nextTablePart) throws RemoteException;
   Map<TablePart, Integer> takeSeat(String uuid) throws RemoteException;
   boolean takeLeftFork(String uuid) throws RemoteException;
   boolean takeRightFork(String uuid) throws RemoteException;
