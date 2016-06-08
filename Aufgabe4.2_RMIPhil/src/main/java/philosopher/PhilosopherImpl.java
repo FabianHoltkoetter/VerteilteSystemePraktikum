@@ -12,7 +12,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -63,13 +62,13 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                 if (isAllowedToEat()) {
 
                     // Go to table
-                    Map<TablePart, Integer> forkIndices;
-                    TablePart tablePart = manager.getRandomTablePart();
-                    LOG.info(String.format("Got TablePart %s", id, tablePart.getId()));
-                    forkIndices = tablePart.takeSeat(id);
+                    Map<Integer, TablePart> forkIndices;
+                    TablePart currentTablePart = manager.getRandomTablePart();
+                    LOG.info(String.format("Got TablePart %s", id, currentTablePart.getId()));
+                    forkIndices = currentTablePart.takeSeat(id);
                     while (forkIndices.size() == 1) {
-                        tablePart = forkIndices.keySet().iterator().next();
-                        forkIndices = tablePart.takeSeat(id);
+                        currentTablePart = forkIndices.get(TablePart.NEXT_TABLEPART);
+                        forkIndices = currentTablePart.takeSeat(id);
                     }
                     LOG.info("Took seat.");
 
@@ -80,10 +79,10 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     LOG.info("Finished Eating.");
 
                     // Leave table
-                    forkIndices.forEach((tablePartt, forkIndex) -> {
+                    forkIndices.forEach((forkIndex, tablePart) -> {
                         try {
-                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePartt.getId()));
-                            tablePartt.leaveSeat(forkIndex);
+                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
+                            tablePart.leaveSeat(forkIndex);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                             LOG.severe("Error in leaveSeat on TP");

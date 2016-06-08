@@ -60,17 +60,17 @@ public class TablePartImpl implements TablePart {
   }
 
   @Override
-  public Map<TablePart, Integer> takeSeat(String uuid) throws RemoteException {
+  public Map<Integer, TablePart> takeSeat(String uuid) throws RemoteException {
 
-    Map<TablePart, Integer> result = new LinkedHashMap<>();
+    Map<Integer, TablePart> result = new LinkedHashMap<>();
 
     //Try to get both forks
     if(takeLeftFork(uuid) && takeRightFork(uuid)){
 
       LOG.log(Level.INFO, String.format("Got both forks on TablePart %s.", id));
 
-      result.put(this, 0);
-      result.put(this, 1);
+      result.put(0, this);
+      result.put(1, this);
       LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
       return result;
 
@@ -88,8 +88,8 @@ public class TablePartImpl implements TablePart {
 
           LOG.log(Level.INFO, String.format("Got left fork on TablePart %s.", nextTablePart.getId()));
 
-          result.put(this, 1);
-          result.put(nextTablePart, 0);
+          result.put(1, this);
+          result.put(0, nextTablePart);
           LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
           return result;
         } else {
@@ -101,7 +101,7 @@ public class TablePartImpl implements TablePart {
 
 
     LOG.log(Level.INFO, String.format("Got no forks on TablePart %s.", id));
-    result.put(nextTablePart, null);
+    result.put(-1, nextTablePart);
     LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
     return result;
   }
