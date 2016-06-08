@@ -30,7 +30,8 @@ public class Fork {
       return true;
 
     } else {
-      locker.unlock();
+      if(locker.isHeldByCurrentThread())
+        locker.unlock();
       return false;
     }
 
