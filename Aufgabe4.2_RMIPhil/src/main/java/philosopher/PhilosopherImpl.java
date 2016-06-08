@@ -64,12 +64,12 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
                     // Go to table
                     Map<TablePart, Integer> forkIndices;
-                    TablePart randomTablePart = manager.getRandomTablePart();
-                    LOG.info(String.format("Got TablePart %s", id, randomTablePart.getId()));
-                    forkIndices = randomTablePart.takeSeat(id);
-                    while (forkIndices.keySet().size() != 2) {
-                        randomTablePart = forkIndices.keySet().iterator().next();
-                        forkIndices = randomTablePart.takeSeat(id);
+                    TablePart tablePart = manager.getRandomTablePart();
+                    LOG.info(String.format("Got TablePart %s", id, tablePart.getId()));
+                    forkIndices = tablePart.takeSeat(id);
+                    while (forkIndices.size() == 1) {
+                        tablePart = forkIndices.keySet().iterator().next();
+                        forkIndices = tablePart.takeSeat(id);
                     }
                     LOG.info("Took seat.");
 
@@ -80,10 +80,10 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     LOG.info("Finished Eating.");
 
                     // Leave table
-                    forkIndices.forEach((tablePart, forkIndex) -> {
+                    forkIndices.forEach((tablePartt, forkIndex) -> {
                         try {
-                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
-                            tablePart.leaveSeat(forkIndex);
+                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePartt.getId()));
+                            tablePartt.leaveSeat(forkIndex);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                             LOG.severe("Error in leaveSeat on TP");

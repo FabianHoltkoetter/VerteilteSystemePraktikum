@@ -4,6 +4,7 @@ import api.Manager;
 import api.Philosopher;
 import api.TablePart;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -66,7 +67,9 @@ public class ManagerImpl implements api.Manager {
         List<String> illegalPhilosophers = new ArrayList<>();
         List<Philosopher> philosophers = philosopherIds.stream().map(s -> {
             try {
-                return (Philosopher) registry.lookup(s);
+                Philosopher lookup = (Philosopher) registry.lookup(s);
+                lookup.getEatCounter();
+                return lookup;
             } catch (Exception e) {
                 illegalPhilosophers.add(s);
                 e.printStackTrace();
@@ -85,7 +88,9 @@ public class ManagerImpl implements api.Manager {
         while (tablePart == null) {
             try {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
+                tablePart.getId();
             } catch (Exception e) {
+                tablePart = null;
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
                 tableIds.remove(index);
@@ -108,6 +113,7 @@ public class ManagerImpl implements api.Manager {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
                 LOG.info(String.format("Got TablePart %s", tablePart.getId()));
             } catch (Exception e) {
+                tablePart = null;
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
                 tableIds.remove(index);
