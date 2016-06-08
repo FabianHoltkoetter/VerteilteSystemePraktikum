@@ -32,9 +32,9 @@ public class BindingProxyImpl implements api.BindingProxy {
       api.BindingProxy stub = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
       Registry registry = LocateRegistry.getRegistry();
       registry.rebind(api.BindingProxy.NAME, stub);
-      LOG.log(Level.INFO, "BindingProxyImpl bound to registry.");
+      LOG.info("BindingProxyImpl bound to registry.");
     } catch (Exception e) {
-      LOG.log(Level.SEVERE, "Exception while binding BindingProxyImpl");
+      LOG.severe("Exception while binding BindingProxyImpl");
       e.printStackTrace();
     }
   }
@@ -44,9 +44,9 @@ public class BindingProxyImpl implements api.BindingProxy {
     try {
       Registry registry = LocateRegistry.getRegistry();
       registry.rebind(name, object);
-      LOG.log(Level.INFO, "Bound " + name + " to registry." );
+      LOG.info("Bound " + name + " to registry." );
     } catch (Exception e) {
-      LOG.log(Level.SEVERE, name + " was not bound!");
+      LOG.severe(name + " was not bound!");
       e.printStackTrace();
     }
   }
