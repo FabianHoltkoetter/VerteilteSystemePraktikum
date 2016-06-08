@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Logger;
 
 /**
@@ -21,21 +20,6 @@ public class BindingProxyImpl implements api.BindingProxy {
 
   public BindingProxyImpl() {
     super();
-  }
-
-  public static void main(String[] args) {
-    if (System.getSecurityManager() == null) {
-      System.setSecurityManager(new SecurityManager());
-    }
-    try {
-      api.BindingProxy stub = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
-      Registry registry = LocateRegistry.getRegistry();
-      registry.rebind(api.BindingProxy.NAME, stub);
-      LOG.info("BindingProxyImpl bound to registry.");
-    } catch (Exception e) {
-      LOG.severe("Exception while binding BindingProxyImpl");
-      e.printStackTrace();
-    }
   }
 
   @Override

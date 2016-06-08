@@ -3,8 +3,6 @@ package manager;
 import api.Philosopher;
 import api.TablePart;
 
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +19,9 @@ public class ManagerImpl implements api.Manager {
     private List<String> philosopherIds = new ArrayList<>();
     private List<String> tableIds = new ArrayList<>();
 
-    public ManagerImpl() {
+    public ManagerImpl(Registry registry) {
         super();
-        try {
-            registry = LocateRegistry.getRegistry();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Can't get registry in Manager.");
-        }
+        this.registry = registry;
     }
 
     @Override
