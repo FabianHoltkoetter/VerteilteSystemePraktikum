@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by Fabian on 08.06.2016.
+ * Created by Rene Zarwel on 10.06.2016.
  */
 public class StartTablePart {
     private static final Logger LOG = Logger.getLogger(StartTablePart.class.getName());
