@@ -6,7 +6,7 @@ import api.TablePart;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -18,6 +18,7 @@ public class ManagerImpl implements api.Manager {
     private final Registry registry;
     private List<String> philosopherIds = new ArrayList<>();
     private List<String> tableIds = new ArrayList<>();
+    private ThreadLocalRandom randomGenerator = ThreadLocalRandom.current();
 
     public ManagerImpl(Registry registry) {
         super();
@@ -51,50 +52,73 @@ public class ManagerImpl implements api.Manager {
             }
             return null;
         }).filter(r -> r != null).collect(Collectors.toList());
+
+        //Remove all illegal Philosophers
         philosopherIds.removeAll(illegalPhilosophers);
+        illegalPhilosophers.forEach(philosopher -> {
+            try {
+                registry.unbind(philosopher);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                LOG.severe("Error while removing dead Philosopher or already removed");
+            }
+        });
+
         return philosophers;
     }
 
     @Override
     public TablePart getNextTablePart(String myUid) {
-        TablePart tablePart = null;
+        TablePart tablePart;
         int index = (tableIds.indexOf(myUid) + 1) % tableIds.size();
-        while (tablePart == null) {
+        while (true) {
             try {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
                 tablePart.getId();
+                return tablePart;
             } catch (Exception e) {
-                tablePart = null;
+
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
-                tableIds.remove(index);
-                if (index >= tableIds.size() - 1) {
+
+                try {
+                    registry.unbind(tableIds.remove(index));
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    LOG.severe("Error while removing dead TablePart or already removed");
+                }
+
+                if (index == tableIds.size()) {
                     index = 0;
                 }
             }
         }
-        return tablePart;
     }
 
     @Override
     public TablePart getRandomTablePart() {
-        TablePart tablePart = null;
-        Random randomGenerator = new Random();
+        TablePart tablePart;
+
         int index = randomGenerator.nextInt(tableIds.size());
 
-        while (tablePart == null) {
+        while (true) {
             try {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
                 LOG.info(String.format("Got TablePart %s", tablePart.getId()));
+                return tablePart;
             } catch (Exception e) {
-                tablePart = null;
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
-                tableIds.remove(index);
+
+                try {
+                    registry.unbind(tableIds.remove(index));
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    LOG.severe("Error while removing dead TablePart or already removed");
+                }
+
                 index = randomGenerator.nextInt(tableIds.size());
             }
         }
-
-        return tablePart;
     }
 }
