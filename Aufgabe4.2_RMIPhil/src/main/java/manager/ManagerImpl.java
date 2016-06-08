@@ -6,6 +6,7 @@ import api.Manager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -15,10 +16,6 @@ import java.util.regex.Matcher;
  */
 public class ManagerImpl implements api.Manager {
     private static final Logger LOG = Logger.getLogger(ManagerImpl.class.getName());
-
-    public ManagerImpl() {
-        super();
-    }
 
     public static void main(String[] args) {
         if (System.getSecurityManager() == null) {
@@ -33,5 +30,34 @@ public class ManagerImpl implements api.Manager {
             LOG.log(Level.SEVERE, "Exception while binding Manager.");
             e.printStackTrace();
         }
+    }
+
+    public ManagerImpl() {
+        super();
+    }
+
+    @Override
+    public void registerTablepart(String uid) {
+
+    }
+
+    @Override
+    public void registerPhilosopher(String uid) {
+
+    }
+
+    @Override
+    public List<String> getPhilosophers() {
+        return null;
+    }
+
+    @Override
+    public String getNextTablePart(String myUid) {
+        return null;
+    }
+
+    @Override
+    public String getRandomTablePart() {
+        return null;
     }
 }
