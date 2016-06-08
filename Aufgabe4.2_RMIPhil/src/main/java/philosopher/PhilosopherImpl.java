@@ -66,8 +66,8 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     TablePart randomTablePart = manager.getRandomTablePart();
                     LOG.log(Level.INFO, String.format("Philosopher %s got TablePart %s", ID, randomTablePart.getID()));
                     forkIndices = randomTablePart.takeSeat(ID);
-                    while (forkIndices == null) {
-                        randomTablePart = manager.getNextTablePart(randomTablePart.getID());
+                    while (forkIndices.keySet().size() != 2) {
+                        randomTablePart = forkIndices.keySet().iterator().next();
                         forkIndices = randomTablePart.takeSeat(ID);
                     }
                     LOG.log(Level.INFO, String.format("Philosopher %s took seat.", ID));
