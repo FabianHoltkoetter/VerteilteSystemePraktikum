@@ -77,14 +77,17 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     Thread.sleep(EAT_TIME);
                     setEatCounter(getEatCounter() + 1);
 
+                    LOG.info(String.format("Philosopher %s finished eating.", id));
+
                     // Leave table
                     forkIndices.forEach((tablePart, forkIndex) -> {
-                      try {
-                        tablePart.leaveSeat(forkIndex);
-                      } catch (RemoteException e) {
-                        e.printStackTrace();
-                        LOG.severe("Error in leaveSeat on TP");
-                      }
+                        try {
+                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
+                            tablePart.leaveSeat(forkIndex);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                            LOG.severe("Error in leaveSeat on TP");
+                        }
                     });
 
                     if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
