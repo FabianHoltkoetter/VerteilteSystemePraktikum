@@ -65,26 +65,29 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     // Go to table
                     Map<TablePart, Integer> forkIndices;
                     TablePart randomTablePart = manager.getRandomTablePart();
-                    LOG.info(String.format("Philosopher %s got TablePart %s", id, randomTablePart.getId()));
+                    LOG.info(String.format("Got TablePart %s", id, randomTablePart.getId()));
                     forkIndices = randomTablePart.takeSeat(id);
                     while (forkIndices.keySet().size() != 2) {
                         randomTablePart = forkIndices.keySet().iterator().next();
                         forkIndices = randomTablePart.takeSeat(id);
                     }
-                    LOG.info(String.format("Philosopher %s took seat.", id));
+                    LOG.info("Took seat.");
 
                     // Eat
                     Thread.sleep(EAT_TIME);
                     setEatCounter(getEatCounter() + 1);
 
+                    LOG.info("Finished Eating.");
+
                     // Leave table
                     forkIndices.forEach((tablePart, forkIndex) -> {
-                      try {
-                        tablePart.leaveSeat(forkIndex);
-                      } catch (RemoteException e) {
-                        e.printStackTrace();
-                        LOG.severe("Error in leaveSeat on TP");
-                      }
+                        try {
+                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
+                            tablePart.leaveSeat(forkIndex);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                            LOG.severe("Error in leaveSeat on TP");
+                        }
                     });
 
                     if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
@@ -95,7 +98,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.severe(String.format("Error in run of Philosopher %s", id));
+            LOG.severe("An Error occured.");
         }
     }
 
