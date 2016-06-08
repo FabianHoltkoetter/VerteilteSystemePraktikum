@@ -22,6 +22,7 @@ public class ManagerController {
   private static final Logger LOG = Logger.getLogger(ManagerController.class.getName());
 
   private static Manager manager;
+  private static BindingProxy binder;
 
   public static void main(String[] args) {
     // Init Manager and Binder
@@ -32,7 +33,7 @@ public class ManagerController {
       Registry registry = LocateRegistry.getRegistry();
 
       manager = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(registry), 0);
-      BindingProxy binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
+      binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
 
       registry.rebind(Manager.NAME, manager);
       registry.rebind(BindingProxy.NAME, binder);

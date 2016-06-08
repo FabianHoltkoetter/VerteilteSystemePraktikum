@@ -55,7 +55,7 @@ public class RecoveryImpl implements Recovery {
 
         Manager manager = (Manager) registry.lookup(Manager.NAME);
         manager.registerRecovery(ID);
-        LOG.info(String.format("Philosopher %s registered in manager.", ID));
+        LOG.info(String.format("Recovery %s registered in manager.", ID));
       }
 
     } catch (Exception e) {
