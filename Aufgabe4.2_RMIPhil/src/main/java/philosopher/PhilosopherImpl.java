@@ -31,6 +31,11 @@ public class PhilosopherImpl implements Philosopher, Runnable {
     private int eatCounter = 0;
     private int meditationTime = MEDITATION_TIME;
 
+    public PhilosopherImpl(String ip, Integer eatCounter){
+        this(ip);
+        this.eatCounter = eatCounter;
+    }
+
     public PhilosopherImpl(String ip) {
         super();
         if (System.getSecurityManager() == null) {
