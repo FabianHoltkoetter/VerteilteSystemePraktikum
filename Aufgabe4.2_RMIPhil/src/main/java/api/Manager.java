@@ -29,22 +29,22 @@ public interface Manager extends Remote {
     /**
      * Get all registered {@link Philosopher}
      *
-     * @return List of all registered {@link Philosopher} UIDs
+     * @return List of all registered {@link Philosopher}
      */
-    public List<String> getPhilosophers();
+    public List<Philosopher> getPhilosophers();
 
     /**
-     * Returns the next tableparts UID. To be used by {@link TablePart} to "close" the table.
+     * Returns the next tablepart. To be used by {@link TablePart} to "close" the table.
      *
      * @param myUid The UID of this table.
-     * @return The UID of the next table.
+     * @return The next table.
      */
-    public String getNextTablePart(String myUid);
+    public TablePart getNextTablePart(String myUid);
 
     /**
-     * Returns a random table parts UID. To be used by {@link Philosopher} to get the first table part to look for a free seat.
+     * Returns a random table part. To be used by {@link Philosopher} to get the first table part to look for a free seat.
      *
-     * @return A random table parts UID.
+     * @return A random table part.
      */
-    public String getRandomTablePart();
+    public TablePart getRandomTablePart();
 }
