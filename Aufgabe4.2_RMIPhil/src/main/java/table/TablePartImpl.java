@@ -71,6 +71,7 @@ public class TablePartImpl implements TablePart {
 
       result.put(this, 0);
       result.put(this, 1);
+      LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
       return result;
 
     } else {
@@ -89,6 +90,7 @@ public class TablePartImpl implements TablePart {
 
           result.put(this, 1);
           result.put(nextTablePart, 0);
+          LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
           return result;
         } else {
           rightFork.unblock();
@@ -100,6 +102,7 @@ public class TablePartImpl implements TablePart {
 
     LOG.log(Level.INFO, String.format("Got no forks on TablePart %s.", id));
     result.put(nextTablePart, null);
+    LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
     return result;
   }
 
