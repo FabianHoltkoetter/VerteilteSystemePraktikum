@@ -5,6 +5,7 @@ import api.Philosopher;
 import api.TablePart;
 import manager.ManagerImpl;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * Created by Fabian on 01.06.2016.
@@ -64,7 +64,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     // Go to table
                     Map<TablePart, Integer> forkIndices;
                     TablePart randomTablePart = manager.getRandomTablePart();
-                    LOG.log(Level.INFO, String.format("Philosopher %s got TablePart %s", ID, randomTablePart.getID()));
+                    LOG.log(Level.INFO, String.format("Philosopher %s got TablePart %s", ID, randomTablePart.getId()));
                     forkIndices = randomTablePart.takeSeat(ID);
                     while (forkIndices.keySet().size() != 2) {
                         randomTablePart = forkIndices.keySet().iterator().next();
@@ -77,7 +77,14 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     setEatCounter(getEatCounter() + 1);
 
                     // Leave table
-                    forkIndices.forEach((tablePart, forkIndex) -> tablePart.leaveSeat(forkIndex, ID));
+                    forkIndices.forEach((tablePart, forkIndex) -> {
+                      try {
+                        tablePart.leaveSeat(forkIndex);
+                      } catch (RemoteException e) {
+                        e.printStackTrace();
+                        LOG.log(Level.SEVERE, "Error in leaveSeat on TP");
+                      }
+                    });
 
                     if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
                         //Sleep after eatCount meals
