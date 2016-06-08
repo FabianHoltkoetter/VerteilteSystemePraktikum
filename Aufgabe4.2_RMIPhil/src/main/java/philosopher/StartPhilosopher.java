@@ -1,7 +1,4 @@
-package starter;
-
-import api.Philosopher;
-import philosopher.PhilosopherImpl;
+package philosopher;
 
 /**
  * Created by Fabian on 08.06.2016.
