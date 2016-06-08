@@ -51,11 +51,13 @@ public class ManagerImpl implements api.Manager {
 
     @Override
     public void registerTablepart(String uid) {
+        LOG.info(String.format("Adding TablePart %s", uid));
         tableIds.add(uid);
     }
 
     @Override
     public void registerPhilosopher(String uid) {
+        LOG.info(String.format("Adding Philosopher %s", uid));
         philosopherIds.add(uid);
     }
 
@@ -104,6 +106,7 @@ public class ManagerImpl implements api.Manager {
         while (tablePart == null) {
             try {
                 tablePart = (TablePart) registry.lookup(tableIds.get(index));
+                LOG.info(String.format("Got TablePart %s", tablePart.getId()));
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
