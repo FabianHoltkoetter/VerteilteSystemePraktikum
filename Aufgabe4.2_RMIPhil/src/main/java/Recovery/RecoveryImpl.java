@@ -1,6 +1,7 @@
 package Recovery;
 
 import api.BindingProxy;
+import api.Manager;
 import api.Recovery;
 import philosopher.PhilosopherImpl;
 import table.TablePartImpl;
@@ -51,6 +52,10 @@ public class RecoveryImpl implements Recovery {
         ((BindingProxy) registry.lookup(BindingProxy.NAME)).proxyRebind(ID, stub);
 
         LOG.info(String.format("Recovery %s bound to registry.", ID));
+
+        Manager manager = (Manager) registry.lookup(Manager.NAME);
+        manager.registerRecovery(ID);
+        LOG.info(String.format("Philosopher %s registered in manager.", ID));
       }
 
     } catch (Exception e) {

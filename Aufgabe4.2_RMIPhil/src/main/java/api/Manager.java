@@ -14,6 +14,20 @@ public interface Manager extends Remote {
     public static final String NAME = "manager";
 
     /**
+     * Registers a {@link Recovery} in the restaurant
+     *
+     * @param vmid The uid with which the @{@link Recovery} is stored in the RMI
+     */
+    public void registerRecovery(String vmid) throws RemoteException;
+
+    /**
+     * Unregisters a {@link Recovery} in the restaurant
+     *
+     * @param vmid The uid of the @{@link Recovery} to be removed
+     */
+    public void unregisterRecovery(String vmid) throws RemoteException;
+
+    /**
      * Registers a {@link TablePart} in the restaurant
      *
      * @param uid The uid with which the @{@link TablePart} is stored in the RMI

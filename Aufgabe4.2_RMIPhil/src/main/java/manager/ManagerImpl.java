@@ -3,6 +3,7 @@ package manager;
 import api.Philosopher;
 import api.TablePart;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,9 @@ import java.util.stream.Collectors;
 public class ManagerImpl implements api.Manager {
   private static final Logger LOG = Logger.getLogger(ManagerImpl.class.getName());
   private final Registry registry;
-  private ArrayList<String> philosopherIds = new ArrayList<>();
-  private ArrayList<String> tableIds = new ArrayList<>();
+  private final ArrayList<String> philosopherIds = new ArrayList<>();
+  private final ArrayList<String> tableIds = new ArrayList<>();
+  private final ArrayList<String> recoveryIds = new ArrayList<>();
   private ThreadLocalRandom randomGenerator = ThreadLocalRandom.current();
 
   public ManagerImpl(Registry registry) {
@@ -26,65 +28,89 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
-  public synchronized void registerTablepart(String uid) {
-    LOG.info(String.format("Adding TablePart %s", uid));
+  public void registerRecovery(String vmid) throws RemoteException {
+    synchronized (recoveryIds) {
+      LOG.info(String.format("Adding Recovery %s", vmid));
+      recoveryIds.add(vmid);
+    }
+  }
 
-    try {
-      //Find new Table
-      TablePart newTablePart = (TablePart) registry.lookup(uid);
-      tableIds.add(uid);
+  @Override
+  public void unregisterRecovery(String vmid) throws RemoteException {
+    synchronized (recoveryIds) {
+      LOG.info(String.format("Removing Recovery %s", vmid));
+      recoveryIds.remove(vmid);
+    }
+  }
 
-      //Get last TP and set the new TP as next
-      String lastId = null;
-      TablePart last;
-      boolean set = false;
-      while (!set) {
-        try {
-          lastId = tableIds.get((tableIds.size() - 1) % tableIds.size());
-          last = (TablePart) registry.lookup(lastId);
+  @Override
+  public void registerTablepart(String uid) {
+    synchronized (tableIds) {
+      LOG.info(String.format("Adding TablePart %s", uid));
 
-          last.setNextTablePart(newTablePart);
-          set = true;
-        } catch (Exception e) {
-          e.printStackTrace();
-          LOG.severe("Found dead TablePart");
+      try {
+        //Find new Table
+        TablePart newTablePart = (TablePart) registry.lookup(uid);
+        tableIds.add(uid);
 
-          unregisterTablepart(lastId);
+        //Get last TP and set the new TP as next
+        String lastId = null;
+        TablePart last;
+        boolean set = false;
+        while (!set) {
+          try {
+            lastId = tableIds.get((tableIds.size() - 1) % tableIds.size());
+            last = (TablePart) registry.lookup(lastId);
+
+            last.setNextTablePart(newTablePart);
+            set = true;
+          } catch (Exception e) {
+            e.printStackTrace();
+            LOG.severe("Found dead TablePart");
+
+            unregisterTablepart(lastId);
+          }
         }
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOG.severe("Error while setting next TablePart");
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      LOG.severe("Error while setting next TablePart");
     }
   }
 
   @Override
-  public synchronized void unregisterTablepart(String uid) {
-    LOG.info(String.format("Remove TablePart %s", uid));
-    try {
-      tableIds.remove(uid);
-      registry.unbind(uid);
-    } catch (Exception e1) {
-      e1.printStackTrace();
-      LOG.severe("Error while removing dead TablePart or already removed");
+  public void unregisterTablepart(String uid) {
+    synchronized (tableIds) {
+      LOG.info(String.format("Remove TablePart %s", uid));
+      try {
+        tableIds.remove(uid);
+        registry.unbind(uid);
+      } catch (Exception e1) {
+        e1.printStackTrace();
+        LOG.severe("Error while removing dead TablePart or already removed");
+      }
     }
   }
 
   @Override
-  public synchronized void registerPhilosopher(String uid) {
-    LOG.info(String.format("Adding Philosopher %s", uid));
-    philosopherIds.add(uid);
+  public void registerPhilosopher(String uid) {
+    synchronized (philosopherIds) {
+      LOG.info(String.format("Adding Philosopher %s", uid));
+      philosopherIds.add(uid);
+    }
   }
 
   @Override
-  public synchronized void unregisterPhilosopher(String uid) {
-    LOG.info(String.format("Remove Philosopher %s", uid));
-    try {
-      philosopherIds.remove(uid);
-      registry.unbind(uid);
-    } catch (Exception e1) {
-      e1.printStackTrace();
-      LOG.severe("Error while removing Philosopher or already removed");
+  public void unregisterPhilosopher(String uid) {
+    synchronized (philosopherIds) {
+      LOG.info(String.format("Remove Philosopher %s", uid));
+      try {
+        philosopherIds.remove(uid);
+        registry.unbind(uid);
+      } catch (Exception e1) {
+        e1.printStackTrace();
+        LOG.severe("Error while removing Philosopher or already removed");
+      }
     }
   }
 
