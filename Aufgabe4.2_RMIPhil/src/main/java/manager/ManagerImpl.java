@@ -87,7 +87,9 @@ public class ManagerImpl implements api.Manager {
                 e.printStackTrace();
                 LOG.log(Level.SEVERE, String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
                 tableIds.remove(index);
-                index = (index + 1) % tableIds.size();
+                if (index >= tableIds.size() - 1) {
+                    index = 0;
+                }
             }
         }
         return tablePart;
