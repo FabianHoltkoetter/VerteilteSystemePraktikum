@@ -1,6 +1,7 @@
 package manager;
 
 import api.Philosopher;
+import api.Recovery;
 import api.TablePart;
 
 import java.rmi.RemoteException;
@@ -8,6 +9,7 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -93,6 +95,31 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
+  public void reportDeadTablepart(String uid) throws RemoteException {
+    LOG.log(Level.INFO, String.format("TablePart reported as dead: %s", uid));
+    unregisterTablepart(uid);
+
+    int ran = randomGenerator.nextInt(recoveryIds.size());
+
+    Recovery recovery;
+
+    while (recoveryIds.size() > 0)
+      try {
+        recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
+        recovery.restartTablePart();
+        LOG.log(Level.INFO, String.format("Started new TablePart on: %s", recoveryIds.get(ran)));
+        return;
+
+      } catch (Exception e) {
+        unregisterRecovery(recoveryIds.get(ran));
+        ran = randomGenerator.nextInt(recoveryIds.size());
+      }
+
+    LOG.log(Level.INFO, "Can't start new TablePart, all Recoveries are down.");
+
+  }
+
+  @Override
   public void registerPhilosopher(String uid) {
     synchronized (philosopherIds) {
       LOG.info(String.format("Adding Philosopher %s", uid));
@@ -112,6 +139,11 @@ public class ManagerImpl implements api.Manager {
         LOG.severe("Error while removing Philosopher or already removed");
       }
     }
+  }
+
+  @Override
+  public void reportDeadPhilosopher(String uid) throws RemoteException {
+    //TODO
   }
 
   @Override
