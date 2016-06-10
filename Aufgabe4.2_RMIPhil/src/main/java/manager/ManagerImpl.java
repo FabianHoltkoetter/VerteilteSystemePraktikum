@@ -85,9 +85,30 @@ public class ManagerImpl implements api.Manager {
   public void unregisterTablepart(String uid) {
     synchronized (tableIds) {
       LOG.info(String.format("Remove TablePart %s", uid));
+
+      //Stop if not in the list
+      if(!tableIds.contains(uid))
+        return;
+
+      //Get table id of table before the one to be removed
+      int indexBefore =(tableIds.indexOf(uid) - 1) % tableIds.size();
+      String tmp = tableIds.get((indexBefore == -1)? tableIds.size()-1:indexBefore);
+
       try {
+        //Remove Table
         tableIds.remove(uid);
         registry.unbind(uid);
+
+        //Stop if there are no more TPs
+        if (tableIds.size() == 0)
+          return;
+
+        //Reset next TP on TP before
+        TablePart before = (TablePart) registry.lookup(tmp);
+        tmp = tableIds.get(tableIds.indexOf(tmp + 1) % tableIds.size());
+        TablePart next = (TablePart) registry.lookup(tmp);
+        before.setNextTablePart(next);
+
       } catch (Exception e1) {
         e1.printStackTrace();
         LOG.severe("Error while removing dead TablePart or already removed");
@@ -124,7 +145,7 @@ public class ManagerImpl implements api.Manager {
   public void registerPhilosopher(String uid) {
     synchronized (philosopherIds) {
       LOG.info(String.format("Adding Philosopher %s", uid));
-      philosopherIds.put(uid,0);
+      philosopherIds.put(uid, 0);
     }
   }
 
