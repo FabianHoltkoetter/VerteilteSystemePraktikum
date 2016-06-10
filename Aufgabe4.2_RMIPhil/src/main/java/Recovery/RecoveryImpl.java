@@ -71,7 +71,7 @@ public class RecoveryImpl implements Recovery {
 
   @Override
   public void restartPhilosopher(Integer eatCount) throws RemoteException {
-    new PhilosopherImpl(ip, eatCount);
+    new Thread(new PhilosopherImpl(ip, eatCount)).start();
   }
 
   @Override

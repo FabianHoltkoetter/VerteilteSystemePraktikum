@@ -1,5 +1,6 @@
 package manager;
 
+import Recovery.RecoveryImpl;
 import api.BindingProxy;
 import api.Manager;
 
@@ -39,9 +40,15 @@ public class ManagerController {
       registry.rebind(BindingProxy.NAME, binder);
 
       LOG.info("Manager and Binder bound to registry.");
+
+      new TableMaster().start();
+
+      RecoveryImpl.startRecovery("localhost");
+
     } catch (Exception e) {
       LOG.severe("Exception while binding Manager/Binder.");
       e.printStackTrace();
+      return;
     }
 
 
