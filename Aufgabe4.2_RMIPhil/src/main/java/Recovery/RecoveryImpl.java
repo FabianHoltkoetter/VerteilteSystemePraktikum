@@ -3,6 +3,8 @@ package Recovery;
 import api.BindingProxy;
 import api.Manager;
 import api.Recovery;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import philosopher.PhilosopherImpl;
 import table.TablePartImpl;
 
@@ -12,8 +14,6 @@ import java.rmi.dgc.VMID;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Logger;
-
 /**
  * Organization: HM FK07.
  * Project: VerteilteSystemePraktikum, Recovery
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class RecoveryImpl implements Recovery {
 
-  private static final Logger LOG = Logger.getLogger(RecoveryImpl.class.getName());
+  private static final Logger LOG = LogManager.getLogger(RecoveryImpl.class.getName());
 
   private static final String ID = new VMID().toString();
 
@@ -59,7 +59,7 @@ public class RecoveryImpl implements Recovery {
       }
 
     } catch (Exception e) {
-      LOG.severe(String.format("Problem binding Recovery %s", ID));
+      LOG.error(String.format("Problem binding Recovery %s", ID));
     }
   }
 

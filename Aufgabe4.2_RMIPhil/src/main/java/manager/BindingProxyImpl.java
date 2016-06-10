@@ -1,10 +1,12 @@
 package manager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.logging.Logger;
 
 /**
  * Organization: HM FK07.
@@ -16,7 +18,7 @@ import java.util.logging.Logger;
  * System: 2,3 GHz Intel Core i7, 16 GB 1600 MHz DDR3
  */
 public class BindingProxyImpl implements api.BindingProxy {
-  private static final Logger LOG = Logger.getLogger(BindingProxyImpl.class.getName());
+  private static final Logger LOG = LogManager.getLogger(BindingProxyImpl.class.getName());
 
   public BindingProxyImpl() {
     super();
@@ -29,7 +31,7 @@ public class BindingProxyImpl implements api.BindingProxy {
       registry.rebind(name, object);
       LOG.info("Bound " + name + " to registry." );
     } catch (Exception e) {
-      LOG.severe(name + " was not bound!");
+      LOG.error(name + " was not bound!");
       e.printStackTrace();
     }
   }

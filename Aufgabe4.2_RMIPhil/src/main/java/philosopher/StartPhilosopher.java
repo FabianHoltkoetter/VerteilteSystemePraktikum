@@ -1,16 +1,15 @@
 package philosopher;
 
 import Recovery.RecoveryImpl;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by Fabian on 08.06.2016.
  */
 public class StartPhilosopher {
 
-  private static final Logger LOG = Logger.getLogger(StartPhilosopher.class.getName());
+  private static final Logger LOG = LogManager.getLogger(StartPhilosopher.class.getName());
 
 
   public static void main(String[] args) {
@@ -26,7 +25,7 @@ public class StartPhilosopher {
       RecoveryImpl.startRecovery(ip);
 
     } else {
-      LOG.log(Level.INFO, "No IP provided in args");
+      LOG.info("No IP provided in args");
     }
   }
 }

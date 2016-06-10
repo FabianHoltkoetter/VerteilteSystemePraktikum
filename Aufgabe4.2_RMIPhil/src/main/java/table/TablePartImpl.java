@@ -3,6 +3,8 @@ package table;
 import api.BindingProxy;
 import api.Manager;
 import api.TablePart;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,15 +13,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by René Zarwel on 01.06.2016.
  */
 public class TablePartImpl implements TablePart {
 
-  private static final Logger LOG = Logger.getLogger(TablePart.class.getName());
+  private static final Logger LOG = LogManager.getLogger(TablePart.class.getName());
 
 
   private final String id = UUID.randomUUID().toString();
@@ -42,17 +42,17 @@ public class TablePartImpl implements TablePart {
       BindingProxy bindingProxy = (BindingProxy) registry.lookup(BindingProxy.NAME);
       bindingProxy.proxyRebind(id, stub);
 
-      LOG.log(Level.INFO, String.format("TablePart %s bound to registry.", id));
+      LOG.info(String.format("TablePart %s bound to registry.", id));
 
       Manager manager = (Manager) registry.lookup(Manager.NAME);
       manager.registerTablepart(id);
 
-      LOG.log(Level.INFO, String.format("TablePart %s registered in manager.", id));
+      LOG.info(String.format("TablePart %s registered in manager.", id));
 
       nextTablePart = manager.getNextTablePart(id);
 
     } catch (Exception e) {
-      LOG.log(Level.SEVERE, String.format("Problem binding TablePart %s.", id));
+      LOG.error(String.format("Problem binding TablePart %s.", id));
       throw new RuntimeException(e.getMessage());
     }
 
@@ -67,33 +67,33 @@ public class TablePartImpl implements TablePart {
     //Try to get both forks
     if(takeLeftFork(uuid) && takeRightFork(uuid)){
 
-      LOG.log(Level.INFO, String.format("Got both forks on TablePart %s.", id));
+      LOG.info(String.format("Got both forks on TablePart %s.", id));
 
       result.put(0, this);
       result.put(1, this);
-      LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
+      LOG.info(String.format("Return: %s.", result.toString()));
       return result;
 
     } else {
       //Dont got both forks, free and move further
       leftFork.unblock();
-      LOG.log(Level.INFO, String.format("Dont got both forks on TablePart %s.", id));
+      LOG.info(String.format("Dont got both forks on TablePart %s.", id));
 
       //Try to get right fork and left fork of next TP
       if(takeRightFork(uuid)){
 
-        LOG.log(Level.INFO, String.format("Got right fork on TablePart %s.", id));
+        LOG.info(String.format("Got right fork on TablePart %s.", id));
 
         //Cache locally to prevent failure on nextTablePart change
         TablePart nextTP = nextTablePart;
 
         if(nextTP.takeLeftFork(uuid)){
 
-          LOG.log(Level.INFO, String.format("Got left fork on TablePart %s.", nextTP.getId()));
+          LOG.info(String.format("Got left fork on TablePart %s.", nextTP.getId()));
 
           result.put(1, this);
           result.put(0, nextTP);
-          LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
+          LOG.info(String.format("Return: %s.", result.toString()));
           return result;
         } else {
           rightFork.unblock();
@@ -103,9 +103,9 @@ public class TablePartImpl implements TablePart {
     }
 
 
-    LOG.log(Level.INFO, String.format("Got no forks on TablePart %s.", id));
+    LOG.info(String.format("Got no forks on TablePart %s.", id));
     result.put(-1, nextTablePart);
-    LOG.log(Level.INFO, String.format("Return: %s.", result.toString()));
+    LOG.info(String.format("Return: %s.", result.toString()));
     return result;
   }
 
@@ -127,7 +127,7 @@ public class TablePartImpl implements TablePart {
       case 1: rightFork.unblock();
         break;
       default:
-        LOG.log(Level.INFO, "Wrong Seat Number");
+        LOG.info("Wrong Seat Number");
     }
   }
 

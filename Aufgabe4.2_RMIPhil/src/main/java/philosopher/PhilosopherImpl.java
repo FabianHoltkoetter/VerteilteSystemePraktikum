@@ -4,7 +4,8 @@ import api.BindingProxy;
 import api.Manager;
 import api.Philosopher;
 import api.TablePart;
-import manager.ManagerImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -12,13 +13,12 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * Created by Fabian on 01.06.2016.
  */
 public class PhilosopherImpl implements Philosopher, Runnable {
-  private static final Logger LOG = Logger.getLogger(ManagerImpl.class.getName());
+  private static final Logger LOG = LogManager.getLogger(PhilosopherImpl.class.getName());
   public static final int MEALS_BEFORE_SLEEP = 3;
   public static final int MEDITATION_TIME = 5;
   public static final int EAT_TIME = 1;
@@ -50,7 +50,9 @@ public class PhilosopherImpl implements Philosopher, Runnable {
       manager.registerPhilosopher(id);
       LOG.info(String.format("Philosopher %s registered in manager.", id));
     } catch (Exception e) {
-      LOG.severe(String.format("Problem binding Philosopher %s.", id));
+      LOG.debug("test");
+      LOG.info("asdf");
+      LOG.error(String.format("Problem binding Philosopher %s.", id));
       throw new RuntimeException(e.getMessage());
     }
   }
@@ -90,7 +92,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
               tablePart.leaveSeat(forkIndex);
             } catch (RemoteException e) {
               e.printStackTrace();
-              LOG.severe("Error in leaveSeat on TP");
+              LOG.error("Error in leaveSeat on TP");
             }
           });
 
@@ -102,7 +104,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      LOG.severe("An Error occured.");
+      LOG.error("An Error occured.");
     }
   }
 

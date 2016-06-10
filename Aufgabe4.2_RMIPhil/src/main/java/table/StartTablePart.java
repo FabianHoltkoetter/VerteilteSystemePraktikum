@@ -1,15 +1,14 @@
 package table;
 
 import Recovery.RecoveryImpl;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by Rene Zarwel on 10.06.2016.
  */
 public class StartTablePart {
-  private static final Logger LOG = Logger.getLogger(StartTablePart.class.getName());
+  private static final Logger LOG = LogManager.getLogger(StartTablePart.class.getName());
 
 
   public static void main(String[] args) {
@@ -23,7 +22,7 @@ public class StartTablePart {
       RecoveryImpl.startRecovery(ip);
 
     } else {
-      LOG.log(Level.INFO, "No IP provided in args");
+      LOG.info("No IP provided in args");
     }
   }
 }

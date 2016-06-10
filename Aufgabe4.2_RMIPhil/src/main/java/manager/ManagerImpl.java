@@ -3,6 +3,8 @@ package manager;
 import api.Philosopher;
 import api.Recovery;
 import api.TablePart;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -10,15 +12,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Created by Fabian on 01.06.2016.
  */
 public class ManagerImpl implements api.Manager {
-  private static final Logger LOG = Logger.getLogger(ManagerImpl.class.getName());
+  private static final Logger LOG = LogManager.getLogger(ManagerImpl.class.getName());
   private final Registry registry;
   private final Map<String, Integer> philosopherIds = new LinkedHashMap<>();
   private final ArrayList<String> tableIds = new ArrayList<>();
@@ -69,14 +69,14 @@ public class ManagerImpl implements api.Manager {
             set = true;
           } catch (Exception e) {
             e.printStackTrace();
-            LOG.severe("Found dead TablePart");
+            LOG.error("Found dead TablePart");
 
             unregisterTablepart(lastId);
           }
         }
       } catch (Exception e) {
         e.printStackTrace();
-        LOG.severe("Error while setting next TablePart");
+        LOG.error("Error while setting next TablePart");
       }
     }
   }
@@ -111,14 +111,14 @@ public class ManagerImpl implements api.Manager {
 
       } catch (Exception e1) {
         e1.printStackTrace();
-        LOG.severe("Error while removing dead TablePart or already removed");
+        LOG.error("Error while removing dead TablePart or already removed");
       }
     }
   }
 
   @Override
   public void reportDeadTablepart(String uid) {
-    LOG.log(Level.INFO, String.format("TablePart reported as dead: %s", uid));
+    LOG.info(String.format("TablePart reported as dead: %s", uid));
     unregisterTablepart(uid);
 
     int ran = randomGenerator.nextInt(recoveryIds.size());
@@ -129,7 +129,7 @@ public class ManagerImpl implements api.Manager {
       try {
         recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
         recovery.restartTablePart();
-        LOG.log(Level.INFO, String.format("Started new TablePart on: %s", recoveryIds.get(ran)));
+        LOG.info(String.format("Started new TablePart on: %s", recoveryIds.get(ran)));
         return;
 
       } catch (Exception e) {
@@ -137,7 +137,7 @@ public class ManagerImpl implements api.Manager {
         ran = randomGenerator.nextInt(recoveryIds.size());
       }
 
-    LOG.log(Level.INFO, "Can't start new TablePart, all Recoveries are down.");
+    LOG.info("Can't start new TablePart, all Recoveries are down.");
 
   }
 
@@ -158,14 +158,14 @@ public class ManagerImpl implements api.Manager {
         registry.unbind(uid);
       } catch (Exception e1) {
         e1.printStackTrace();
-        LOG.severe("Error while removing Philosopher or already removed");
+        LOG.error("Error while removing Philosopher or already removed");
       }
     }
   }
 
   @Override
   public void reportDeadPhilosopher(String uid) {
-    LOG.log(Level.INFO, String.format("Philosopher reported as dead: %s", uid));
+    LOG.info(String.format("Philosopher reported as dead: %s", uid));
 
     Integer eatCount = philosopherIds.get(uid);
     unregisterPhilosopher(uid);
@@ -178,7 +178,7 @@ public class ManagerImpl implements api.Manager {
       try {
         recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
         recovery.restartPhilosopher(eatCount);
-        LOG.log(Level.INFO, String.format("Started new Philosopher on: %s", recoveryIds.get(ran)));
+        LOG.info(String.format("Started new Philosopher on: %s", recoveryIds.get(ran)));
         return;
 
       } catch (Exception e) {
@@ -186,7 +186,7 @@ public class ManagerImpl implements api.Manager {
         ran = randomGenerator.nextInt(recoveryIds.size());
       }
 
-    LOG.log(Level.INFO, "Can't start new Philosopher, all Recoveries are down.");
+    LOG.info("Can't start new Philosopher, all Recoveries are down.");
   }
 
   @Override
@@ -201,7 +201,7 @@ public class ManagerImpl implements api.Manager {
       } catch (Exception e) {
         illegalPhilosophers.add(s);
         e.printStackTrace();
-        LOG.severe(String.format("Philosopher %s  not found. Removing from active philosophers.", s));
+        LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", s));
       }
       return null;
     }).filter(r -> r != null).collect(Collectors.toList());
@@ -224,7 +224,7 @@ public class ManagerImpl implements api.Manager {
       } catch (Exception e) {
 
         e.printStackTrace();
-        LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
+        LOG.error(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
         reportDeadTablepart(tableIds.get(index));
 
@@ -248,7 +248,7 @@ public class ManagerImpl implements api.Manager {
         return tablePart;
       } catch (Exception e) {
         e.printStackTrace();
-        LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
+        LOG.error(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
         reportDeadTablepart(tableIds.get(index));
 

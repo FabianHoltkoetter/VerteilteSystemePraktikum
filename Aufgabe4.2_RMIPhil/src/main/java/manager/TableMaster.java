@@ -2,19 +2,19 @@ package manager;
 
 import api.Manager;
 import api.Philosopher;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Fabian on 08.06.2016.
  */
 public class TableMaster extends Thread {
-  private static final Logger LOG = Logger.getLogger(TableMaster.class.getName());
+  private static final Logger LOG = LogManager.getLogger(TableMaster.class.getName());
   private static final int PAUSE = 5000;
 
   private int avgEatCout;
@@ -26,14 +26,14 @@ public class TableMaster extends Thread {
       manager = (Manager) registry.lookup(Manager.NAME);
       LOG.info("TableMaster received Manager.");
     } catch (Exception e) {
-      LOG.severe("Error in TableMaster.");
+      LOG.error("Error in TableMaster.");
       throw new RuntimeException(e.getMessage());
     }
   }
 
   @Override
   public void run() {
-    LOG.log(Level.INFO, "TableMaster started!");
+    LOG.info("TableMaster started!");
     while (!isInterrupted()) {
       try {
         Thread.sleep(PAUSE);
@@ -71,7 +71,7 @@ public class TableMaster extends Thread {
 
       } catch (Exception e) {
         e.printStackTrace();
-        LOG.severe("Error in TableMaster!");
+        LOG.error("Error in TableMaster!");
       }
     }
   }

@@ -3,11 +3,12 @@ package manager;
 import Recovery.RecoveryImpl;
 import api.BindingProxy;
 import api.Manager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Logger;
 
 /**
  * Organization: HM FK07.
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class ManagerController {
 
-  private static final Logger LOG = Logger.getLogger(ManagerController.class.getName());
+  private static final Logger LOG = LogManager.getLogger(ManagerController.class.getName());
 
   private static Manager manager;
   private static BindingProxy binder;
@@ -46,7 +47,7 @@ public class ManagerController {
       RecoveryImpl.startRecovery("localhost");
 
     } catch (Exception e) {
-      LOG.severe("Exception while binding Manager/Binder.");
+      LOG.error("Exception while binding Manager/Binder.");
       e.printStackTrace();
       return;
     }
