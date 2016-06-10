@@ -1,13 +1,16 @@
 package manager;
 
 import api.Philosopher;
+import api.Recovery;
 import api.TablePart;
 
-import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 public class ManagerImpl implements api.Manager {
   private static final Logger LOG = Logger.getLogger(ManagerImpl.class.getName());
   private final Registry registry;
-  private final ArrayList<String> philosopherIds = new ArrayList<>();
+  private final Map<String, Integer> philosopherIds = new LinkedHashMap<>();
   private final ArrayList<String> tableIds = new ArrayList<>();
   private final ArrayList<String> recoveryIds = new ArrayList<>();
   private ThreadLocalRandom randomGenerator = ThreadLocalRandom.current();
@@ -28,7 +31,7 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
-  public void registerRecovery(String vmid) throws RemoteException {
+  public void registerRecovery(String vmid) {
     synchronized (recoveryIds) {
       LOG.info(String.format("Adding Recovery %s", vmid));
       recoveryIds.add(vmid);
@@ -36,7 +39,7 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
-  public void unregisterRecovery(String vmid) throws RemoteException {
+  public void unregisterRecovery(String vmid) {
     synchronized (recoveryIds) {
       LOG.info(String.format("Removing Recovery %s", vmid));
       recoveryIds.remove(vmid);
@@ -82,9 +85,30 @@ public class ManagerImpl implements api.Manager {
   public void unregisterTablepart(String uid) {
     synchronized (tableIds) {
       LOG.info(String.format("Remove TablePart %s", uid));
+
+      //Stop if not in the list
+      if(!tableIds.contains(uid))
+        return;
+
+      //Get table id of table before the one to be removed
+      int indexBefore =(tableIds.indexOf(uid) - 1) % tableIds.size();
+      String tmp = tableIds.get((indexBefore == -1)? tableIds.size()-1:indexBefore);
+
       try {
+        //Remove Table
         tableIds.remove(uid);
         registry.unbind(uid);
+
+        //Stop if there are no more TPs
+        if (tableIds.size() == 0)
+          return;
+
+        //Reset next TP on TP before
+        TablePart before = (TablePart) registry.lookup(tmp);
+        tmp = tableIds.get(tableIds.indexOf(tmp + 1) % tableIds.size());
+        TablePart next = (TablePart) registry.lookup(tmp);
+        before.setNextTablePart(next);
+
       } catch (Exception e1) {
         e1.printStackTrace();
         LOG.severe("Error while removing dead TablePart or already removed");
@@ -93,10 +117,35 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
+  public void reportDeadTablepart(String uid) {
+    LOG.log(Level.INFO, String.format("TablePart reported as dead: %s", uid));
+    unregisterTablepart(uid);
+
+    int ran = randomGenerator.nextInt(recoveryIds.size());
+
+    Recovery recovery;
+
+    while (recoveryIds.size() > 0)
+      try {
+        recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
+        recovery.restartTablePart();
+        LOG.log(Level.INFO, String.format("Started new TablePart on: %s", recoveryIds.get(ran)));
+        return;
+
+      } catch (Exception e) {
+        unregisterRecovery(recoveryIds.get(ran));
+        ran = randomGenerator.nextInt(recoveryIds.size());
+      }
+
+    LOG.log(Level.INFO, "Can't start new TablePart, all Recoveries are down.");
+
+  }
+
+  @Override
   public void registerPhilosopher(String uid) {
     synchronized (philosopherIds) {
       LOG.info(String.format("Adding Philosopher %s", uid));
-      philosopherIds.add(uid);
+      philosopherIds.put(uid, 0);
     }
   }
 
@@ -115,12 +164,39 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
+  public void reportDeadPhilosopher(String uid) {
+    LOG.log(Level.INFO, String.format("Philosopher reported as dead: %s", uid));
+
+    Integer eatCount = philosopherIds.get(uid);
+    unregisterPhilosopher(uid);
+
+    int ran = randomGenerator.nextInt(recoveryIds.size());
+
+    Recovery recovery;
+
+    while (recoveryIds.size() > 0)
+      try {
+        recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
+        recovery.restartPhilosopher(eatCount);
+        LOG.log(Level.INFO, String.format("Started new Philosopher on: %s", recoveryIds.get(ran)));
+        return;
+
+      } catch (Exception e) {
+        unregisterRecovery(recoveryIds.get(ran));
+        ran = randomGenerator.nextInt(recoveryIds.size());
+      }
+
+    LOG.log(Level.INFO, "Can't start new Philosopher, all Recoveries are down.");
+  }
+
+  @Override
   public List<Philosopher> getPhilosophers() {
     List<String> illegalPhilosophers = new ArrayList<>();
-    List<Philosopher> philosophers = philosopherIds.stream().map(s -> {
+    List<Philosopher> philosophers = philosopherIds.keySet().stream().map(s -> {
       try {
         Philosopher lookup = (Philosopher) registry.lookup(s);
-        lookup.getEatCounter();
+        //Cache EatCount for recovery
+        philosopherIds.put(s, lookup.getEatCounter());
         return lookup;
       } catch (Exception e) {
         illegalPhilosophers.add(s);
@@ -131,7 +207,7 @@ public class ManagerImpl implements api.Manager {
     }).filter(r -> r != null).collect(Collectors.toList());
 
     //Remove all illegal Philosophers
-    illegalPhilosophers.forEach(this::unregisterPhilosopher);
+    illegalPhilosophers.forEach(this::reportDeadPhilosopher);
 
     return philosophers;
   }
@@ -150,7 +226,7 @@ public class ManagerImpl implements api.Manager {
         e.printStackTrace();
         LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
-        unregisterTablepart(tableIds.get(index));
+        reportDeadTablepart(tableIds.get(index));
 
         if (index == tableIds.size()) {
           index = 0;
@@ -174,7 +250,7 @@ public class ManagerImpl implements api.Manager {
         e.printStackTrace();
         LOG.severe(String.format("TablePart %s  not found. Removing from active table parts.", tableIds.get(index)));
 
-        unregisterTablepart(tableIds.get(index));
+        reportDeadTablepart(tableIds.get(index));
 
         index = randomGenerator.nextInt(tableIds.size());
       }
