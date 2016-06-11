@@ -13,6 +13,6 @@ import java.rmi.RemoteException;
  * System: 2,3 GHz Intel Core i7, 16 GB 1600 MHz DDR3
  */
 public interface Recovery extends Remote {
-  void restartPhilosopher(Integer eatCount) throws RemoteException;
+  void restartPhilosopher(Integer eatCount, boolean hungry) throws RemoteException;
   void restartTablePart() throws RemoteException;
 }

@@ -18,7 +18,7 @@ public class StartPhilosopher {
 
       String ip = args[0];
 
-      PhilosopherImpl p = new PhilosopherImpl(ip);
+      PhilosopherImpl p = new PhilosopherImpl(ip, false);
       new Thread(p).start();
 
 

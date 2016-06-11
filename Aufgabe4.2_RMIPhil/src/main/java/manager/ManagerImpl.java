@@ -7,10 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -20,7 +17,7 @@ import java.util.stream.Collectors;
 public class ManagerImpl implements api.Manager {
   private static final Logger LOG = LogManager.getLogger(ManagerImpl.class.getName());
   private final Registry registry;
-  private final Map<String, Integer> philosopherIds = new LinkedHashMap<>();
+  private final Map<String, Map.Entry<Integer, Boolean>> philosopherIds = new LinkedHashMap<>();
   private final ArrayList<String> tableIds = new ArrayList<>();
   private final ArrayList<String> recoveryIds = new ArrayList<>();
   private ThreadLocalRandom randomGenerator = ThreadLocalRandom.current();
@@ -142,10 +139,10 @@ public class ManagerImpl implements api.Manager {
   }
 
   @Override
-  public void registerPhilosopher(String uid) {
+  public void registerPhilosopher(String uid, boolean hungry) {
     synchronized (philosopherIds) {
       LOG.info(String.format("Adding Philosopher %s", uid));
-      philosopherIds.put(uid, 0);
+      philosopherIds.put(uid, new AbstractMap.SimpleEntry<>(0, hungry));
     }
   }
 
@@ -167,7 +164,8 @@ public class ManagerImpl implements api.Manager {
   public void reportDeadPhilosopher(String uid) {
     LOG.info(String.format("Philosopher reported as dead: %s", uid));
 
-    Integer eatCount = philosopherIds.get(uid);
+    Integer eatCount = philosopherIds.get(uid).getKey();
+    Boolean hungry = philosopherIds.get(uid).getValue();
     unregisterPhilosopher(uid);
 
     int ran = randomGenerator.nextInt(recoveryIds.size());
@@ -177,7 +175,7 @@ public class ManagerImpl implements api.Manager {
     while (recoveryIds.size() > 0)
       try {
         recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
-        recovery.restartPhilosopher(eatCount);
+        recovery.restartPhilosopher(eatCount, hungry);
         LOG.info(String.format("Started new Philosopher on: %s", recoveryIds.get(ran)));
         return;
 
@@ -196,7 +194,7 @@ public class ManagerImpl implements api.Manager {
       try {
         Philosopher lookup = (Philosopher) registry.lookup(s);
         //Cache EatCount for recovery
-        philosopherIds.put(s, lookup.getEatCounter());
+        philosopherIds.put(s, new AbstractMap.SimpleEntry<>(lookup.getEatCounter(), lookup.isHungry()));
         return lookup;
       } catch (Exception e) {
         illegalPhilosophers.add(s);

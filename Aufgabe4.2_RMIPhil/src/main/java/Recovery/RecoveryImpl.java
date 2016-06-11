@@ -59,6 +59,7 @@ public class RecoveryImpl implements Recovery {
       }
 
     } catch (Exception e) {
+      e.printStackTrace();
       LOG.error(String.format("Problem binding Recovery %s", ID));
     }
   }
@@ -70,8 +71,8 @@ public class RecoveryImpl implements Recovery {
   }
 
   @Override
-  public void restartPhilosopher(Integer eatCount) throws RemoteException {
-    new Thread(new PhilosopherImpl(ip, eatCount)).start();
+  public void restartPhilosopher(Integer eatCount, boolean hungry) throws RemoteException {
+    new Thread(new PhilosopherImpl(ip, eatCount, hungry)).start();
   }
 
   @Override

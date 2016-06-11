@@ -53,7 +53,7 @@ public interface Manager extends Remote {
    *
    * @param uid The uid with which the {@link Philosopher} is stored in the RMI
    */
-  public void registerPhilosopher(String uid) throws RemoteException;
+  public void registerPhilosopher(String uid, boolean hungry) throws RemoteException;
 
   /**
    * Unregisters a {@link Philosopher} in the restaurant
