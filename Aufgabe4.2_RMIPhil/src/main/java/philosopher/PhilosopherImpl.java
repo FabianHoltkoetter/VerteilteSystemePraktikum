@@ -6,11 +6,15 @@ import api.Philosopher;
 import api.TablePart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +36,8 @@ public class PhilosopherImpl implements Philosopher, Runnable {
     private int eatCounter = 0;
     private int meditationTime = MEDITATION_TIME;
 
+    private TablePart firstTable;
+
     public PhilosopherImpl(String ip, Integer eatCounter, boolean hungry) {
         this(ip, hungry);
         this.eatCounter = eatCounter;
@@ -40,11 +46,15 @@ public class PhilosopherImpl implements Philosopher, Runnable {
     public PhilosopherImpl(String ip, boolean hungry) {
         super();
         this.hungry = hungry;
-        if (this.hungry)
+
+        if (this.hungry) {
             meditationTime /= 3;
+        }
+
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
+
         try {
             Philosopher stub = (Philosopher) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.getRegistry(ip);
@@ -54,62 +64,101 @@ public class PhilosopherImpl implements Philosopher, Runnable {
             manager.registerPhilosopher(id, this.hungry);
             LOG.info(String.format("Philosopher %s registered in manager.", id));
         } catch (Exception e) {
-            LOG.debug("test");
-            LOG.info("asdf");
             LOG.error(String.format("Problem binding Philosopher %s.", id));
             throw new RuntimeException(e.getMessage());
         }
+
+        firstTable = getFirstTable();
     }
 
     @Override
     public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted()) {
 
-                // Meditate
+            // Meditate
+            try {
                 Thread.sleep(meditationTime);
+            } catch (InterruptedException e) {
+                LOG.error("Philosopher got interrupted while sleeping.");
+            }
 
+            if (isAllowedToEat()) {
+                // Go to table
+                Map<Integer, TablePart> forkIndices = new LinkedHashMap<>();
+                TablePart currentTablePart = firstTable;
 
-                if (isAllowedToEat()) {
-
-                    // Go to table
-                    Map<Integer, TablePart> forkIndices;
-                    TablePart currentTablePart = manager.getRandomTablePart();
-                    LOG.info(String.format("Got TablePart %s", id, currentTablePart.getId()));
+                try {
+                    LOG.debug(String.format("Got TablePart %s", id, currentTablePart.getId()));
                     forkIndices = currentTablePart.takeSeat(id);
-                    while (forkIndices.size() == 1) {
-                        currentTablePart = forkIndices.get(TablePart.NEXT_TABLEPART);
+                } catch (RemoteException e) {
+                    LOG.error("Couldn't reach first TablePart. Retreiving new first Table.");
+                    currentTablePart = getFirstTable();
+                }
+
+                while (forkIndices.size() == 1) {
+                    currentTablePart = forkIndices.get(TablePart.NEXT_TABLEPART);
+                    try {
                         forkIndices = currentTablePart.takeSeat(id);
+                    } catch (RemoteException e) {
+                        LOG.error("Error trying to take seat on table. Retrying from first Table.");
+                        currentTablePart = getFirstTable();
                     }
-                    LOG.info("Took seat.");
+                }
 
-                    // Eat
+                LOG.debug("Took seat.");
+
+                // Eat
+                try {
                     Thread.sleep(EAT_TIME);
-                    setEatCounter(getEatCounter() + 1);
+                } catch (InterruptedException e) {
+                    LOG.error("Philosopher got interrupted during eating.");
+                }
+                setEatCounter(getEatCounter() + 1);
 
-                    LOG.info("Finished Eating.");
+                LOG.debug("Finished Eating.");
 
-                    // Leave table
-                    forkIndices.forEach((forkIndex, tablePart) -> {
-                        try {
-                            LOG.info(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
-                            tablePart.leaveSeat(forkIndex);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                            LOG.error("Error in leaveSeat on TP");
-                        }
-                    });
+                // Leave table
+                forkIndices.forEach((forkIndex, tablePart) -> {
+                    try {
+                        LOG.debug(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
+                        tablePart.leaveSeat(forkIndex);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                        LOG.error("Error in leaveSeat on TP");
+                    }
+                });
 
-                    if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
-                        //Sleep after eatCount meals
+                if (eatCounter % MEALS_BEFORE_SLEEP == 0) {
+                    //Sleep after eatCount meals
+                    try {
                         Thread.sleep(SLEEP_TIME);
+                    } catch (InterruptedException e) {
+                        LOG.error("Philosopher got interrupted during meditation.");
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("An Error occured.");
         }
+    }
+
+    private TablePart getFirstTable() {
+        try {
+            firstTable.getId();
+        } catch (RemoteException rme) {
+            while (true) {
+                try {
+                    firstTable = manager.getRandomTablePart();
+                } catch (RemoteException e) {
+                    LOG.error("Error retrieving first table. Retrying in 1 second.");
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e1) {
+                        LOG.error("Philosopher got interrupted while waiting.");
+                    }
+                }
+            }
+        }
+
+        return firstTable;
     }
 
     public boolean isHungry() {
