@@ -141,19 +141,25 @@ public class PhilosopherImpl implements Philosopher, Runnable {
     }
 
     private TablePart getFirstTable() {
+        boolean validTable = firstTable != null;
         try {
-            firstTable.getId();
+            if (validTable) {
+                firstTable.getId();
+            }
         } catch (RemoteException rme) {
-            while (true) {
+            validTable = false;
+        }
+
+        while (!validTable) {
+            try {
+                firstTable = manager.getRandomTablePart();
+                validTable = true;
+            } catch (RemoteException e) {
+                LOG.error("Error retrieving first table. Retrying in 1 second.");
                 try {
-                    firstTable = manager.getRandomTablePart();
-                } catch (RemoteException e) {
-                    LOG.error("Error retrieving first table. Retrying in 1 second.");
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e1) {
-                        LOG.error("Philosopher got interrupted while waiting.");
-                    }
+                    Thread.sleep(1);
+                } catch (InterruptedException e1) {
+                    LOG.error("Philosopher got interrupted while waiting.");
                 }
             }
         }
