@@ -85,23 +85,30 @@ public class PhilosopherImpl implements Philosopher, Runnable {
             if (isAllowedToEat()) {
                 // Go to table
                 Map<Integer, TablePart> forkIndices = new LinkedHashMap<>();
-                TablePart currentTablePart = firstTable;
+                TablePart currentTablePart = getFirstTable();
 
-                try {
-                    LOG.debug(String.format("Got TablePart %s", id, currentTablePart.getId()));
-                    forkIndices = currentTablePart.takeSeat(id);
-                } catch (RemoteException e) {
-                    LOG.error("Couldn't reach first TablePart. Retreiving new first Table.");
-                    currentTablePart = getFirstTable();
-                }
-
-                while (forkIndices.size() == 1) {
-                    currentTablePart = forkIndices.get(TablePart.NEXT_TABLEPART);
+                while (forkIndices.keySet().size() == 0) {
                     try {
+                        LOG.debug(String.format("Got TablePart %s", id, currentTablePart.getId()));
                         forkIndices = currentTablePart.takeSeat(id);
                     } catch (RemoteException e) {
-                        LOG.error("Error trying to take seat on table. Retrying from first Table.");
+                        LOG.error("Couldn't reach first TablePart. Retreiving new first Table.");
                         currentTablePart = getFirstTable();
+                    }
+                }
+
+                while (forkIndices.size() != 2) {
+                    currentTablePart = forkIndices.get(TablePart.NEXT_TABLEPART);
+                    boolean validRequest = false;
+                    while(!validRequest) {
+                        try {
+                            forkIndices = currentTablePart.takeSeat(id);
+                            validRequest = true;
+                        } catch (RemoteException e) {
+                            LOG.error("Error trying to take seat on table. Retrying from first Table.");
+                            currentTablePart = getFirstTable();
+                            validRequest = false;
+                        }
                     }
                 }
 
@@ -122,6 +129,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
                     try {
                         LOG.debug(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
                         tablePart.leaveSeat(forkIndex);
+                        firstTable = tablePart;
                     } catch (RemoteException e) {
                         e.printStackTrace();
                         LOG.error("Error in leaveSeat on TP");
