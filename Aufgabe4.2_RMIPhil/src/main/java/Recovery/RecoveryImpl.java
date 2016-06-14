@@ -14,6 +14,7 @@ import java.rmi.dgc.VMID;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+
 /**
  * Organization: HM FK07.
  * Project: VerteilteSystemePraktikum, Recovery
@@ -28,7 +29,6 @@ public class RecoveryImpl implements Recovery {
   private static final Logger LOG = LogManager.getLogger(RecoveryImpl.class.getName());
 
   private static final String ID = new VMID().toString();
-
 
   public final String ip;
 
