@@ -34,8 +34,11 @@ public class ManagerController {
     try {
       Registry registry = LocateRegistry.getRegistry();
 
-      manager = (Manager) UnicastRemoteObject.exportObject(new ManagerImpl(registry), 0);
+      ManagerImpl obj = new ManagerImpl(registry);
+      manager = (Manager) UnicastRemoteObject.exportObject(obj, 0);
       binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(), 0);
+
+      new Thread(obj).start();
 
       registry.rebind(Manager.NAME, manager);
       registry.rebind(BindingProxy.NAME, binder);
