@@ -32,7 +32,10 @@ public class RecoveryImpl implements Recovery {
 
   static {
     String vmid = ManagementFactory.getRuntimeMXBean().getName();
-    ID = vmid.split("@")[1];
+    if(vmid.contains("@"))
+      ID = vmid.split("@")[1];
+    else
+      ID = vmid;
   }
 
   public final String ip;
