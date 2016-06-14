@@ -277,7 +277,6 @@ public class ManagerImpl implements api.Manager, Runnable {
                     return philID;
                 }
             }).filter(r -> r != null).collect(Collectors.toList());
-            LOG.debug("All phils checked");
 
             // Check all TableParts
             List<String> deadTables = tableIds.stream().map(tableID -> {
@@ -290,11 +289,9 @@ public class ManagerImpl implements api.Manager, Runnable {
                     return tableID;
                 }
             }).filter(r -> r != null).collect(Collectors.toList());
-            LOG.debug("All tables checked");
 
             deadPhils.forEach(this::reportDeadPhilosopher);
             deadTables.forEach(this::reportDeadTablepart);
-            LOG.debug(String.format("Removed %d dead philosophers and %d dead tables.", deadPhils.size(), deadTables.size()));
 
             // Sleep for specified time
             try {
