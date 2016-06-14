@@ -179,6 +179,11 @@ public class PhilosopherImpl implements Philosopher, Runnable {
         return hungry;
     }
 
+    @Override
+    public void stop() throws RemoteException {
+        Thread.currentThread().interrupt();
+    }
+
     public String getId() {
         return id;
     }

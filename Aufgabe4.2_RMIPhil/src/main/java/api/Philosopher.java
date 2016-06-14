@@ -10,4 +10,5 @@ public interface Philosopher extends Remote {
     public void setAllowedToEat(boolean allowedToEat) throws RemoteException;
     public int getEatCounter() throws RemoteException;
     public boolean isHungry() throws RemoteException;
+    public void stop() throws RemoteException;
 }

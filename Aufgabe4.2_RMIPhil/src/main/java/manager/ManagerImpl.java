@@ -6,6 +6,7 @@ import api.TablePart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.*;
@@ -268,11 +269,25 @@ public class ManagerImpl implements api.Manager {
 
     @Override
     public boolean removeGracefully(String id) throws RemoteException {
-        if (tableIds.remove(id)) {
-            return true;
-        } else if (philosopherIds.remove(id) != null) {
-            return true;
+        boolean remove = tableIds.remove(id);
+        Map.Entry<Integer, Boolean> remove1 = philosopherIds.remove(id);
+        if (remove1 != null) {
+            try {
+                Philosopher philosopher = (Philosopher) registry.lookup(id);
+                philosopher.stop();
+            } catch (NotBoundException e) {
+                LOG.error("Philosopher was already dead.");
+            }
+        } else if(!remove){
+            return false;
         }
-        return false;
+
+        try {
+            registry.unbind(id);
+        } catch (NotBoundException e) {
+            LOG.error("Unbind was unsuccessful.");
+        }
+
+        return true;
     }
 }
