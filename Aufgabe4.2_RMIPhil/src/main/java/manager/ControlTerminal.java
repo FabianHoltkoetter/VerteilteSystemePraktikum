@@ -47,7 +47,7 @@ public class ControlTerminal implements Runnable {
             if (command.equals("ps")) {
                 listAll();
             } else if (command.startsWith("stop")) {
-                stop(command.split(" ")[1]);
+                stop(scanner.next());
             } else {
                 displayHelp();
             }
@@ -57,21 +57,24 @@ public class ControlTerminal implements Runnable {
     private void listAll() {
         try {
             List<String> tps = manager.getTableIds();
-            List<String> phils = manager.getPhilIds();
+            List<String> phils = manager.getPhilosopherIds();
+
+            System.out.println("Table Parts:");
+            tps.stream().forEach(System.out::println);
+            System.out.println("Philosophers:");
+            phils.stream().forEach(System.out::println);
         } catch (RemoteException e) {
             System.out.println(String.format("An error occured: %s", e.getMessage()));
         }
-
-        System.out.println("Table Parts:");
-        tps.stream().forEach(System.out::println);
-        System.out.println("Philosophers:");
-        phils.stream().forEach(System.out::println);
     }
 
     private void stop(String id) {
         try {
-            manager.removeGracefully(id);
-            System.out.println(String.format("Removed ID %s", id));
+            if(manager.removeGracefully(id)) {
+                System.out.println(String.format("Removed item with ID <%s>", id));
+            } else {
+                System.out.println(String.format("No element with ID <%s> found.", id));
+            }
         } catch (RemoteException e) {
             System.out.println(String.format("An error occured: %s", e.getMessage()));
         }
