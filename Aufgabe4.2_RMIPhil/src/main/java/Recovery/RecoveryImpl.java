@@ -8,9 +8,9 @@ import org.apache.logging.log4j.Logger;
 import philosopher.PhilosopherImpl;
 import table.TablePartImpl;
 
+import java.lang.management.ManagementFactory;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.dgc.VMID;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -28,7 +28,12 @@ public class RecoveryImpl implements Recovery {
 
   private static final Logger LOG = LogManager.getLogger(RecoveryImpl.class.getName());
 
-  private static final String ID = new VMID().toString();
+  private static final String ID;
+
+  static {
+    String vmid = ManagementFactory.getRuntimeMXBean().getName();
+    ID = vmid.split("@")[1];
+  }
 
   public final String ip;
 
