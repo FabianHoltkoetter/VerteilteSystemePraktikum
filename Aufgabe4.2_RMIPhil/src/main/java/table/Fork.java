@@ -1,5 +1,7 @@
 package table;
 
+import philosopher.PhilosopherImpl;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -13,11 +15,18 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Fork {
 
+  //Max Block Time to prevent Dead Philosopher Blocking
+  private static final long MAX_BLOCK_TIME = PhilosopherImpl.EAT_TIME * 5;
+
   private ReentrantLock locker = new ReentrantLock();
   private String uuid = "";
+  private long blockStart;
 
   private boolean isFree(){
-    return uuid.length() == 0;
+
+    long currentTime = System.currentTimeMillis();
+
+    return uuid.length() == 0 || (currentTime - blockStart) > MAX_BLOCK_TIME;
   }
 
   public boolean tryBlock(String uuid){
@@ -25,6 +34,7 @@ public class Fork {
     if(locker.tryLock() && isFree()) {
 
       this.uuid = uuid;
+      blockStart = System.currentTimeMillis();
 
       locker.unlock();
       return true;
