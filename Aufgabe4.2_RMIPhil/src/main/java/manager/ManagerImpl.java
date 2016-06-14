@@ -92,7 +92,7 @@ public class ManagerImpl implements api.Manager, Runnable {
 
             //Get table id of table before the one to be removed
             int indexBefore = (tableIds.indexOf(uid) - 1) % tableIds.size();
-            String tmp = tableIds.get((indexBefore == -1) ? tableIds.size() - 1 : indexBefore);
+            String tmpID = tableIds.get((indexBefore == -1) ? tableIds.size() - 1 : indexBefore);
 
             try {
                 //Remove Table
@@ -104,9 +104,9 @@ public class ManagerImpl implements api.Manager, Runnable {
                     return;
 
                 //Reset next TP on TP before
-                TablePart before = (TablePart) registry.lookup(tmp);
-                tmp = tableIds.get(tableIds.indexOf(tmp + 1) % tableIds.size());
-                TablePart next = (TablePart) registry.lookup(tmp);
+                TablePart before = (TablePart) registry.lookup(tmpID);
+                tmpID = tableIds.get((tableIds.indexOf(tmpID) + 1) % tableIds.size());
+                TablePart next = (TablePart) registry.lookup(tmpID);
                 before.setNextTablePart(next);
 
             } catch (Exception e1) {
@@ -125,7 +125,7 @@ public class ManagerImpl implements api.Manager, Runnable {
 
         Recovery recovery;
 
-        while (recoveryIds.size() > 0)
+        while (recoveryIds.size() > 0) {
             try {
                 recovery = (Recovery) registry.lookup(recoveryIds.get(ran));
                 recovery.restartTablePart();
@@ -136,6 +136,7 @@ public class ManagerImpl implements api.Manager, Runnable {
                 unregisterRecovery(recoveryIds.get(ran));
                 ran = randomGenerator.nextInt(recoveryIds.size());
             }
+        }
 
         LOG.info("Can't start new TablePart, all Recoveries are down.");
 
@@ -265,33 +266,35 @@ public class ManagerImpl implements api.Manager, Runnable {
     public void run() {
         while (!Thread.interrupted()) {
 
-            synchronized (philosopherIds) {
-                // Check all Philosophers
-                philosopherIds.keySet().stream().map(philID -> {
-                    try {
-                        Philosopher lookup = (Philosopher) registry.lookup(philID);
-                        lookup.isHungry();
-                        return null;
-                    } catch (NotBoundException | RemoteException e) {
-                        LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
-                        return philID;
-                    }
-                }).filter(r -> r != null).forEach(this::reportDeadPhilosopher);
-            }
+            // Check all Philosophers
+            List<String> deadPhils = philosopherIds.keySet().stream().map(philID -> {
+                try {
+                    Philosopher lookup = (Philosopher) registry.lookup(philID);
+                    lookup.isHungry();
+                    return null;
+                } catch (NotBoundException | RemoteException e) {
+                    LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
+                    return philID;
+                }
+            }).filter(r -> r != null).collect(Collectors.toList());
+            LOG.debug("All phils checked");
 
-            synchronized (tableIds) {
-                // Check all TableParts
-                tableIds.stream().map(tableID -> {
-                    try {
-                        TablePart lookup = (TablePart) registry.lookup(tableID);
-                        lookup.getId();
-                        return null;
-                    } catch (NotBoundException | RemoteException e) {
-                        LOG.error(String.format("TablePart %s  not found. Removing from active tableparts.", tableID));
-                        return tableID;
-                    }
-                }).filter(r -> r != null).forEach(this::reportDeadTablepart);
-            }
+            // Check all TableParts
+            List<String> deadTables = tableIds.stream().map(tableID -> {
+                try {
+                    TablePart lookup = (TablePart) registry.lookup(tableID);
+                    lookup.getId();
+                    return null;
+                } catch (NotBoundException | RemoteException e) {
+                    LOG.error(String.format("TablePart %s  not found. Removing from active tableparts.", tableID));
+                    return tableID;
+                }
+            }).filter(r -> r != null).collect(Collectors.toList());
+            LOG.debug("All tables checked");
+
+            deadPhils.forEach(this::reportDeadPhilosopher);
+            deadTables.forEach(this::reportDeadTablepart);
+            LOG.debug(String.format("Removed %d dead philosophers and %d dead tables.", deadPhils.size(), deadTables.size()));
 
             // Sleep for specified time
             try {
