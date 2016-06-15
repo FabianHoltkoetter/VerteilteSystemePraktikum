@@ -189,6 +189,7 @@ public class ManagerImpl implements api.Manager, Runnable {
                 return;
 
             } catch (Exception e) {
+                e.printStackTrace();
                 unregisterRecovery(recoveryIds.get(ran));
                 ran = randomGenerator.nextInt(recoveryIds.size());
             }

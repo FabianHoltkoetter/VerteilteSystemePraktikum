@@ -160,13 +160,17 @@ public class PhilosopherImpl implements Philosopher, Runnable {
         while (!validTable) {
             try {
                 firstTable = manager.getRandomTablePart();
-                validTable = true;
+                validTable = firstTable != null;
+                LOG.debug(validTable ? "Got new table" : "Retrying in 5 second.");
             } catch (RemoteException e) {
-                LOG.error("Error retrieving first table. Retrying in 1 second.");
+                LOG.error("Error retrieving first table. Retrying in 5 second.");
+                validTable = false;
+            }
+            if (!validTable) {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e1) {
-                    LOG.error("Philosopher got interrupted while waiting.");
+                    LOG.error("Got interrupted while sleeping.");
                 }
             }
         }
@@ -176,7 +180,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
     @Override
     public void replaceStoppedTable(String id, TablePart tablePart) throws RemoteException {
-        if(getFirstTable().getId().equals(id)){
+        if (getFirstTable().getId().equals(id)) {
             firstTable = tablePart;
         }
     }
