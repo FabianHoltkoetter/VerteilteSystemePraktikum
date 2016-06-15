@@ -55,6 +55,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
         }
 
         try {
+            LOG.debug("Started Philosopher with ID " + id);
             Philosopher stub = (Philosopher) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.getRegistry(ip);
             ((BindingProxy) registry.lookup(BindingProxy.NAME)).proxyRebind(id, this);
