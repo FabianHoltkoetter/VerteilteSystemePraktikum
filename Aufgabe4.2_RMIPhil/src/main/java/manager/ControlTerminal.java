@@ -70,11 +70,7 @@ public class ControlTerminal implements Runnable {
 
     private void stop(String id) {
         try {
-            if(manager.removeGracefully(id)) {
-                System.out.println(String.format("Removed item with ID <%s>", id));
-            } else {
-                System.out.println(String.format("No element with ID <%s> found.", id));
-            }
+            manager.stopRemote(id);
         } catch (RemoteException e) {
             System.out.println(String.format("An error occured: %s", e.getMessage()));
         }

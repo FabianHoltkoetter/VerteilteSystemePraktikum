@@ -108,8 +108,7 @@ public interface Manager extends Remote {
   /**
    * Shuts down a table or philosopher.
    * @param id ID of tablepart or philosopher.
-   * @return whether deletion was successful.
    * @throws RemoteException
      */
-  public boolean removeGracefully(String id) throws RemoteException;
+  public void stopRemote(String id) throws RemoteException;
 }

@@ -268,26 +268,17 @@ public class ManagerImpl implements api.Manager {
     }
 
     @Override
-    public boolean removeGracefully(String id) throws RemoteException {
-        boolean remove = tableIds.remove(id);
-        Map.Entry<Integer, Boolean> remove1 = philosopherIds.remove(id);
-        if (remove1 != null) {
+    public void stopRemote(String id) throws RemoteException {
+        if (tableIds.contains(id)) {
+            unregisterTablepart(id);
+        } else if (philosopherIds.containsKey(id)) {
             try {
-                Philosopher philosopher = (Philosopher) registry.lookup(id);
-                philosopher.stop();
-            } catch (NotBoundException e) {
-                LOG.error("Philosopher was already dead.");
+                Philosopher lookup = (Philosopher) registry.lookup(id);
+                lookup.stop();
+            } catch (NotBoundException | RemoteException e) {
+                LOG.error(e.getMessage());
             }
-        } else if(!remove){
-            return false;
+            unregisterPhilosopher(id);
         }
-
-        try {
-            registry.unbind(id);
-        } catch (NotBoundException e) {
-            LOG.error("Unbind was unsuccessful.");
-        }
-
-        return true;
     }
 }
