@@ -90,4 +90,25 @@ public interface Manager extends Remote {
    * @return A random table part.
    */
   public TablePart getRandomTablePart() throws RemoteException;
+
+  /**
+   * Returns all table ids.
+   * @return all table ids.
+   * @throws RemoteException
+     */
+  public List<String> getTableIds() throws RemoteException;
+
+  /**
+   * Returns all philosopher ids.
+   * @return all philosopher ids.
+   * @throws RemoteException
+     */
+  public List<String> getPhilosopherIds() throws RemoteException;
+
+  /**
+   * Shuts down a table or philosopher.
+   * @param id ID of tablepart or philosopher.
+   * @throws RemoteException
+     */
+  public void stopRemote(String id) throws RemoteException;
 }
