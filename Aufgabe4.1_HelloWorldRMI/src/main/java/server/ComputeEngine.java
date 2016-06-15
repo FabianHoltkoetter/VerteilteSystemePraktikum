@@ -1,12 +1,9 @@
 package server;
 
 import api.Compute;
-import api.Task;
-import sun.rmi.transport.tcp.TCPTransport;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class ComputeEngine implements Compute {
@@ -15,13 +12,8 @@ public class ComputeEngine implements Compute {
         super();
     }
 
-    public <T> T executeTask(Task<T> t) {
-        try {
-            System.out.println(TCPTransport.getClientHost());
-        } catch (ServerNotActiveException e) {
-            e.printStackTrace();
-        }
-        return t.execute();
+    public void sayHello(){
+        System.out.println("Hello World!");
     }
 
     public static void main(String[] args) {
