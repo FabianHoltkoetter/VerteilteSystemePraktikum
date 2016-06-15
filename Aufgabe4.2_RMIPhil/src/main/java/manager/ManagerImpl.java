@@ -258,30 +258,31 @@ public class ManagerImpl implements api.Manager, Runnable {
             }
         }
     }
-  @Override
-  public List<String> getTableIds() throws RemoteException {
-    return tableIds;
-  }
 
-  @Override
-  public List<String> getPhilosopherIds() throws RemoteException {
-    return new ArrayList<>(philosopherIds.keySet());
-  }
-
-  @Override
-  public void stopRemote(String id) throws RemoteException {
-    if (tableIds.contains(id)) {
-      unregisterTablepart(id);
-    } else if (philosopherIds.containsKey(id)) {
-      try {
-        Philosopher lookup = (Philosopher) registry.lookup(id);
-        lookup.stop();
-      } catch (NotBoundException | RemoteException e) {
-        LOG.error(e.getMessage());
-      }
-      unregisterPhilosopher(id);
+    @Override
+    public List<String> getTableIds() throws RemoteException {
+        return tableIds;
     }
-  }
+
+    @Override
+    public List<String> getPhilosopherIds() throws RemoteException {
+        return new ArrayList<>(philosopherIds.keySet());
+    }
+
+    @Override
+    public void stopRemote(String id) throws RemoteException {
+        if (tableIds.contains(id)) {
+            unregisterTablepart(id);
+        } else if (philosopherIds.containsKey(id)) {
+            try {
+                Philosopher lookup = (Philosopher) registry.lookup(id);
+                lookup.stop();
+            } catch (NotBoundException | RemoteException e) {
+                LOG.error(e.getMessage());
+            }
+            unregisterPhilosopher(id);
+        }
+    }
 
     /**
      * Checks every second if all tableparts are available.
@@ -291,28 +292,28 @@ public class ManagerImpl implements api.Manager, Runnable {
         while (!Thread.interrupted()) {
 
             // Check all Philosophers
-            List<String> deadPhils = philosopherIds.keySet().stream().map(philID -> {
+            List<String> deadPhils = philosopherIds.keySet().stream().filter(philID -> {
                 try {
                     Philosopher lookup = (Philosopher) registry.lookup(philID);
                     lookup.isHungry();
-                    return null;
+                    return false;
                 } catch (NotBoundException | RemoteException e) {
                     LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
-                    return philID;
+                    return true;
                 }
-            }).filter(r -> r != null).collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
             // Check all TableParts
-            List<String> deadTables = tableIds.stream().map(tableID -> {
+            List<String> deadTables = tableIds.stream().filter(tableID -> {
                 try {
                     TablePart lookup = (TablePart) registry.lookup(tableID);
                     lookup.getId();
-                    return null;
+                    return false;
                 } catch (NotBoundException | RemoteException e) {
                     LOG.error(String.format("TablePart %s  not found. Removing from active tableparts.", tableID));
-                    return tableID;
+                    return true;
                 }
-            }).filter(r -> r != null).collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
             deadPhils.forEach(this::reportDeadPhilosopher);
             deadTables.forEach(this::reportDeadTablepart);
