@@ -14,6 +14,9 @@ import java.util.Scanner;
 public class ControlTerminal implements Runnable {
 
     public static void main(String[] args) {
+        if(System.getProperty("java.security.policy") == null || System.getProperty("java.security.policy").isEmpty())
+            System.setProperty("java.security.policy","file:./security.policy");
+
         if(args.length != 1){
             throw new IllegalArgumentException("please specify ip of registry as argument.");
         }
