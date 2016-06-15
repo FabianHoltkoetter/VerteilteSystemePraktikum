@@ -241,7 +241,11 @@ public class ManagerImpl implements api.Manager, Runnable {
     public TablePart getRandomTablePart() {
         TablePart tablePart;
 
-        int index = randomGenerator.nextInt(tableIds.size());
+        if(tableIds.size() == 0)
+          return null;
+
+
+        int index = randomGenerator.nextInt( tableIds.size());
 
         while (true) {
             try {
@@ -272,7 +276,22 @@ public class ManagerImpl implements api.Manager, Runnable {
     @Override
     public void stopRemote(String id) throws RemoteException {
         if (tableIds.contains(id)) {
-            unregisterTablepart(id);
+          unregisterTablepart(id);
+          LOG.debug("Table stopped: " + id);
+
+          philosopherIds.keySet().forEach(philosopherID -> {
+
+            try {
+              Philosopher philosopher = (Philosopher) registry.lookup(philosopherID);
+
+              philosopher.replaceStoppedTable(id, getRandomTablePart());
+
+            } catch (Exception e) {
+              LOG.debug("Error on replacing tablepart: " + e.getMessage());
+            }
+
+          });
+
         } else if (philosopherIds.containsKey(id)) {
             try {
                 Philosopher lookup = (Philosopher) registry.lookup(id);
@@ -281,6 +300,9 @@ public class ManagerImpl implements api.Manager, Runnable {
                 LOG.error(e.getMessage());
             }
             unregisterPhilosopher(id);
+            LOG.debug("Philosopher stopped: " + id);
+        } else {
+          LOG.error("Unknown ID: " + id);
         }
     }
 

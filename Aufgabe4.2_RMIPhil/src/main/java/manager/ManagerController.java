@@ -45,23 +45,14 @@ public class ManagerController {
 
       LOG.info("Manager and Binder bound to registry.");
 
-      //new TableMaster().start();
+      new TableMaster().start();
 
       RecoveryImpl.startRecovery("localhost");
 
     } catch (Exception e) {
       LOG.error("Exception while binding Manager/Binder.");
       e.printStackTrace();
-      return;
     }
 
-
-    //Controll Loop to take actions from console
-    while (!Thread.interrupted()) {
-      //Read input
-
-      //Process input
-
-    }
   }
 }

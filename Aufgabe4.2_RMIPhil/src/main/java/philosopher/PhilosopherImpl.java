@@ -6,14 +6,11 @@ import api.Philosopher;
 import api.TablePart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -30,6 +27,8 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
     private final String id = UUID.randomUUID().toString();
     private final Manager manager;
+
+    private boolean alive = true;
 
     private boolean allowedToEat = true;
     private boolean hungry = false;
@@ -73,7 +72,7 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (alive) {
 
             // Meditate
             try {
@@ -175,13 +174,20 @@ public class PhilosopherImpl implements Philosopher, Runnable {
         return firstTable;
     }
 
+    @Override
+    public void replaceStoppedTable(String id, TablePart tablePart) throws RemoteException {
+        if(getFirstTable().getId().equals(id)){
+            firstTable = tablePart;
+        }
+    }
+
     public boolean isHungry() {
         return hungry;
     }
 
     @Override
     public void stop() throws RemoteException {
-        Thread.currentThread().interrupt();
+        alive = false;
     }
 
     public String getId() {

@@ -11,4 +11,5 @@ public interface Philosopher extends Remote {
     public int getEatCounter() throws RemoteException;
     public boolean isHungry() throws RemoteException;
     public void stop() throws RemoteException;
+    public void replaceStoppedTable(String id, TablePart tablePart) throws RemoteException;
 }
