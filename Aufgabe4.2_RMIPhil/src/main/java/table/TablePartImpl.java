@@ -2,10 +2,13 @@ package table;
 
 import api.BindingProxy;
 import api.Manager;
+import api.SimpleRMIClientSocketFactory;
+import api.SimpleRMIServerSocketFactory;
 import api.TablePart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,7 +20,7 @@ import java.util.UUID;
 /**
  * Created by René Zarwel on 01.06.2016.
  */
-public class TablePartImpl implements TablePart {
+public class TablePartImpl implements TablePart, Serializable{
 
   private static final Logger LOG = LogManager.getLogger(TablePart.class.getName());
 
@@ -29,7 +32,7 @@ public class TablePartImpl implements TablePart {
 
   private TablePart nextTablePart;
 
-  public TablePartImpl(String ip) {
+  public TablePartImpl(String managerIP, String ownIP) {
 
     super();
     if (System.getSecurityManager() == null) {
@@ -38,8 +41,12 @@ public class TablePartImpl implements TablePart {
     try {
       LOG.debug("Started TablePart with ID " + id);
       //Register on Registry
-      TablePart stub = (TablePart) UnicastRemoteObject.exportObject(this, 0);
-      Registry registry = LocateRegistry.getRegistry(ip);
+
+      SimpleRMIClientSocketFactory csf = new SimpleRMIClientSocketFactory(ownIP);
+      SimpleRMIServerSocketFactory ssf = new SimpleRMIServerSocketFactory();
+
+      TablePart stub = (TablePart) UnicastRemoteObject.exportObject(this, 0,csf, ssf);
+      Registry registry = LocateRegistry.getRegistry(managerIP);
       BindingProxy bindingProxy = (BindingProxy) registry.lookup(BindingProxy.NAME);
       bindingProxy.proxyRebind(id, stub);
 

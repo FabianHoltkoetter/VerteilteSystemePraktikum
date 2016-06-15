@@ -30,7 +30,7 @@ public class ManagerController {
 
     if (args.length == 1) {
 
-      String ip = args[0];
+      String hostIP = args[0];
 
       if (System.getProperty("java.security.policy") == null || System.getProperty("java.security.policy").isEmpty())
         System.setProperty("java.security.policy", "file:./security.policy");
@@ -40,11 +40,11 @@ public class ManagerController {
         System.setSecurityManager(new SecurityManager());
       }
       try {
-        Registry registry = LocateRegistry.getRegistry(ip);
+        Registry registry = LocateRegistry.getRegistry(hostIP);
 
         ManagerImpl obj = new ManagerImpl(registry);
         manager = (Manager) UnicastRemoteObject.exportObject(obj, 0);
-        binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(ip), 0);
+        binder = (api.BindingProxy) UnicastRemoteObject.exportObject(new BindingProxyImpl(hostIP), 0);
 
         new Thread(obj).start();
 
@@ -53,9 +53,9 @@ public class ManagerController {
 
         LOG.info("Manager and Binder bound to registry.");
 
-        new TableMaster(ip).start();
+        new TableMaster(hostIP).start();
 
-        RecoveryImpl.startRecovery("localhost");
+        RecoveryImpl.startRecovery(hostIP, hostIP);
 
       } catch (Exception e) {
         LOG.error("Exception while binding Manager/Binder.");

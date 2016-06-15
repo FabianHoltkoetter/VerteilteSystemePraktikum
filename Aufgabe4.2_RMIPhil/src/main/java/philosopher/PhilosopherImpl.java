@@ -3,10 +3,13 @@ package philosopher;
 import api.BindingProxy;
 import api.Manager;
 import api.Philosopher;
+import api.SimpleRMIClientSocketFactory;
+import api.SimpleRMIServerSocketFactory;
 import api.TablePart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,7 +21,7 @@ import java.util.UUID;
 /**
  * Created by Fabian on 01.06.2016.
  */
-public class PhilosopherImpl implements Philosopher, Runnable {
+public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
     private static final Logger LOG = LogManager.getLogger(PhilosopherImpl.class.getName());
     public static final int MEALS_BEFORE_SLEEP = 3;
     public static final int MEDITATION_TIME = 5;
@@ -37,12 +40,12 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
     private TablePart firstTable;
 
-    public PhilosopherImpl(String ip, Integer eatCounter, boolean hungry) {
-        this(ip, hungry);
+    public PhilosopherImpl(String ip, String ownIP, Integer eatCounter, boolean hungry) {
+        this(ip,ownIP, hungry);
         this.eatCounter = eatCounter;
     }
 
-    public PhilosopherImpl(String ip, boolean hungry) {
+    public PhilosopherImpl(String managerIP, String ownIP, boolean hungry) {
         super();
         this.hungry = hungry;
 
@@ -56,8 +59,12 @@ public class PhilosopherImpl implements Philosopher, Runnable {
 
         try {
             LOG.debug("Started Philosopher with ID " + id);
-            Philosopher stub = (Philosopher) UnicastRemoteObject.exportObject(this, 0);
-            Registry registry = LocateRegistry.getRegistry(ip);
+
+            SimpleRMIClientSocketFactory csf = new SimpleRMIClientSocketFactory(ownIP);
+            SimpleRMIServerSocketFactory ssf = new SimpleRMIServerSocketFactory();
+
+            Philosopher stub = (Philosopher) UnicastRemoteObject.exportObject(this, 0, csf, ssf);
+            Registry registry = LocateRegistry.getRegistry(managerIP);
             ((BindingProxy) registry.lookup(BindingProxy.NAME)).proxyRebind(id, this);
             LOG.info(String.format("Philosopher %s bound to registry.", id));
             manager = (Manager) registry.lookup(Manager.NAME);

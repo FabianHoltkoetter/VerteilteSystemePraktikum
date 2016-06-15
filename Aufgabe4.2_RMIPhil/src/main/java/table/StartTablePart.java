@@ -16,13 +16,14 @@ public class StartTablePart {
     if(System.getProperty("java.security.policy") == null || System.getProperty("java.security.policy").isEmpty())
       System.setProperty("java.security.policy","file:./security.policy");
 
-    if (args.length == 1) {
+    if (args.length == 2) {
 
-      String ip = args[0];
+      String hostIP = args[0];
+      String ownIP = args[1];
 
-      new TablePartImpl(ip);
+      new TablePartImpl(hostIP, ownIP);
 
-      RecoveryImpl.startRecovery(ip);
+      RecoveryImpl.startRecovery(hostIP, ownIP);
 
     } else {
       LOG.info("No IP provided in args");
