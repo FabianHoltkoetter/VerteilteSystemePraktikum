@@ -43,6 +43,11 @@ public class ManagerImpl implements api.Manager, Runnable {
         synchronized (recoveryIds) {
             LOG.info(String.format("Removing Recovery %s", vmid));
             recoveryIds.remove(vmid);
+          try {
+            registry.unbind(vmid);
+          } catch (Exception e) {
+            LOG.error("Error on unbind Recovery.");
+          }
         }
     }
 
