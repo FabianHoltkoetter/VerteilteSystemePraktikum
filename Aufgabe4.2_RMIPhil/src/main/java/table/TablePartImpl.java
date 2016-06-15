@@ -36,6 +36,7 @@ public class TablePartImpl implements TablePart {
       System.setSecurityManager(new SecurityManager());
     }
     try {
+      LOG.debug("Started TablePart with ID " + id);
       //Register on Registry
       TablePart stub = (TablePart) UnicastRemoteObject.exportObject(this, 0);
       Registry registry = LocateRegistry.getRegistry(ip);
