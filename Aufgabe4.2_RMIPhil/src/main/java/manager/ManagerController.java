@@ -53,7 +53,7 @@ public class ManagerController {
 
         LOG.info("Manager and Binder bound to registry.");
 
-        new TableMaster().start();
+        new TableMaster(ip).start();
 
         RecoveryImpl.startRecovery("localhost");
 

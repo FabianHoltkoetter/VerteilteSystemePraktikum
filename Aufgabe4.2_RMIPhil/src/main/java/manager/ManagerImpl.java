@@ -78,6 +78,9 @@ public class ManagerImpl implements api.Manager, Runnable {
                         LOG.error("Found dead TablePart");
 
                         unregisterTablepart(lastId);
+
+                        if(tableIds.size() == 0)
+                          throw new RuntimeException("Cant connect to any tablepart.");
                     }
                 }
             } catch (Exception e) {

@@ -20,9 +20,9 @@ public class TableMaster extends Thread {
   private int avgEatCout;
   private final Manager manager;
 
-  public TableMaster() {
+  public TableMaster(String ip) {
     try {
-      Registry registry = LocateRegistry.getRegistry();
+      Registry registry = LocateRegistry.getRegistry(ip);
       manager = (Manager) registry.lookup(Manager.NAME);
       LOG.info("TableMaster received Manager.");
     } catch (Exception e) {
