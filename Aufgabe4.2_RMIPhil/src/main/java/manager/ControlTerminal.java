@@ -1,13 +1,10 @@
 package manager;
 
-import Recovery.RecoveryImpl;
-import api.BindingProxy;
 import api.Manager;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,18 +14,21 @@ import java.util.Scanner;
 public class ControlTerminal implements Runnable {
 
     public static void main(String[] args) {
-        new Thread(new ControlTerminal()).start();
+        if(args.length != 1){
+            throw new IllegalArgumentException("please specify ip of registry as argument.");
+        }
+        new Thread(new ControlTerminal(args[0])).start();
     }
 
     private Manager manager;
 
-    public ControlTerminal() {
+    public ControlTerminal(String ip) {
         // Init Manager and Binder
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
         try {
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(ip);
             manager = (Manager) registry.lookup(Manager.NAME);
         } catch (Exception e) {
             e.printStackTrace();
