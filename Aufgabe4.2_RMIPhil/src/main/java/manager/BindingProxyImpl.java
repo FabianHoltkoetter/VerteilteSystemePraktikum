@@ -20,14 +20,17 @@ import java.rmi.registry.Registry;
 public class BindingProxyImpl implements api.BindingProxy {
   private static final Logger LOG = LogManager.getLogger(BindingProxyImpl.class.getName());
 
-  public BindingProxyImpl() {
+  private final String ip;
+
+  public BindingProxyImpl(String ip) {
     super();
+    this.ip = ip;
   }
 
   @Override
   public void proxyRebind(String name, Remote object) throws RemoteException {
     try {
-      Registry registry = LocateRegistry.getRegistry();
+      Registry registry = LocateRegistry.getRegistry(ip);
       registry.rebind(name, object);
       LOG.info("Bound " + name + " to registry." );
     } catch (Exception e) {
