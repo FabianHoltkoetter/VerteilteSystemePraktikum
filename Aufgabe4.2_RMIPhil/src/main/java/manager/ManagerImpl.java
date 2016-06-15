@@ -34,7 +34,8 @@ public class ManagerImpl implements api.Manager, Runnable {
     public void registerRecovery(String vmid) {
         synchronized (recoveryIds) {
             LOG.info(String.format("Adding Recovery %s", vmid));
-            recoveryIds.add(vmid);
+            if(!recoveryIds.contains(vmid))
+              recoveryIds.add(vmid);
         }
     }
 

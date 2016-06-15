@@ -60,11 +60,11 @@ public class RecoveryImpl implements Recovery {
         ((BindingProxy) registry.lookup(BindingProxy.NAME)).proxyRebind(ID, stub);
 
         LOG.info(String.format("Recovery %s bound to registry.", ID));
-
-        Manager manager = (Manager) registry.lookup(Manager.NAME);
-        manager.registerRecovery(ID);
-        LOG.info(String.format("Recovery %s registered in manager.", ID));
       }
+
+      Manager manager = (Manager) registry.lookup(Manager.NAME);
+      manager.registerRecovery(ID);
+      LOG.info(String.format("Recovery %s registered in manager.", ID));
 
     } catch (Exception e) {
       e.printStackTrace();
