@@ -258,6 +258,30 @@ public class ManagerImpl implements api.Manager, Runnable {
             }
         }
     }
+  @Override
+  public List<String> getTableIds() throws RemoteException {
+    return tableIds;
+  }
+
+  @Override
+  public List<String> getPhilosopherIds() throws RemoteException {
+    return new ArrayList<>(philosopherIds.keySet());
+  }
+
+  @Override
+  public void stopRemote(String id) throws RemoteException {
+    if (tableIds.contains(id)) {
+      unregisterTablepart(id);
+    } else if (philosopherIds.containsKey(id)) {
+      try {
+        Philosopher lookup = (Philosopher) registry.lookup(id);
+        lookup.stop();
+      } catch (NotBoundException | RemoteException e) {
+        LOG.error(e.getMessage());
+      }
+      unregisterPhilosopher(id);
+    }
+  }
 
     /**
      * Checks every second if all tableparts are available.
