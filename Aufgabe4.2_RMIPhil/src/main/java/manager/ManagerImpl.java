@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -320,17 +321,16 @@ public class ManagerImpl implements Manager, Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            List<String> deadPhils;
-            List<String> deadTables;
 
-            synchronized (philosopherIds) {
+            Map<String, Map.Entry<Integer,Boolean>> philEatCache = new HashMap<>();
+
                 // Check all Philosophers
-                deadPhils = philosopherIds.keySet().stream().filter(philID -> {
+            List<String> deadPhils = philosopherIds.keySet().stream().filter(philID -> {
                     try {
                         Philosopher lookup = (Philosopher) registry.lookup(philID);
                         //Try to get eatCounter and save it in list;
                         int eatCount = lookup.getEatCounter();
-                        philosopherIds.put(
+                        philEatCache.put(
                             philID,
                             new AbstractMap.SimpleEntry<>(
                                 eatCount,
@@ -341,9 +341,13 @@ public class ManagerImpl implements Manager, Runnable {
                         return true;
                     }
                 }).collect(Collectors.toList());
+            //Save all the EatCount Data
+            synchronized (philosopherIds) {
+                philEatCache.entrySet().forEach(entry -> philosopherIds.put(entry.getKey(), entry.getValue()));
             }
+
             // Check all TableParts
-            deadTables = tableIds.stream().filter(tableID -> {
+            List<String> deadTables = tableIds.stream().filter(tableID -> {
                 try {
                     TablePart lookup = (TablePart) registry.lookup(tableID);
                     lookup.getId();
