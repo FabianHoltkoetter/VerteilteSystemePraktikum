@@ -200,6 +200,13 @@ public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
     @Override
     public void stop() throws RemoteException {
         alive = false;
+        LOG.debug("GOT STOPPED with eatCount: " + eatCounter);
+    }
+
+    @Override
+    public void start() throws RemoteException {
+        alive = true;
+        LOG.debug("Puhh...can eat again.");
     }
 
     public String getId() {

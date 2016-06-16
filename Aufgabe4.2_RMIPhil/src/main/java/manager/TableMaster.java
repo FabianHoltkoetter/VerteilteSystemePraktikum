@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +17,8 @@ import java.util.Map;
 public class TableMaster extends Thread {
   private static final Logger LOG = LogManager.getLogger(TableMaster.class.getName());
   private static final int PAUSE = 5000;
+
+  private final List<String> stoppedPhils = new ArrayList<>();
 
   private double avgEatCout;
   private final Manager manager;
@@ -47,14 +51,17 @@ public class TableMaster extends Thread {
 
         avgEatCout = philosophers.values().stream().mapToInt(i->i).average().orElse(0.0);
 
-        avgEatCout /= philosophers.size();
-        LOG.info(String.format("Average eat count is %d", avgEatCout));
+        LOG.info(String.format("Average eat count is %f", avgEatCout));
 
         //Allow or forbid philosopher to eat
         philosophers.entrySet().forEach(p -> {
           try {
             if(p.getValue() < avgEatCout * 1.1){
               manager.getPhilosopher(p.getKey()).stop();
+              stoppedPhils.add(p.getKey());
+            } else if(stoppedPhils.contains(p.getKey())){
+              manager.getPhilosopher(p.getKey()).start();
+              stoppedPhils.remove(p.getKey());
             }
           } catch (RemoteException e) {
             e.printStackTrace();
