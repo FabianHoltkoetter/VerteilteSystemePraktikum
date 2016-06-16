@@ -1,7 +1,5 @@
 # Aufgabe 4.2 a
 
-Fragen zum Programmdesign:
-
 ## Wie werden Philosophen, Plätze, Gabeln, programmtechnisch abgebildet?
 
 ### Philosophen
