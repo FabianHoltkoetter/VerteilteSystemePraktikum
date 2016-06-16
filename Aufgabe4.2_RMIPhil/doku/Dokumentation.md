@@ -45,7 +45,7 @@ durch die im oberen Teil beschriebene zeitliche begrenzung des Sperren einer Gab
 
 ## Genereller Aufbau
 
-![Genereller Aufbau](images/aufbau.png)
+![Genereller Aufbau](images/aufbau.PNG)
 
 ## Initialisierung des Managers
 
