@@ -56,11 +56,14 @@ public class TableMaster extends Thread {
         //Allow or forbid philosopher to eat
         philosophers.entrySet().forEach(p -> {
           try {
-            if(p.getValue() < avgEatCout * 1.1){
-              manager.getPhilosopher(p.getKey()).stop();
-              stoppedPhils.add(p.getKey());
+            if(Double.compare(avgEatCout * 1.1, p.getValue()) == -1 ){
+              if(!stoppedPhils.contains(p.getKey())) {
+                manager.getPhilosopher(p.getKey()).setAllowedToEat(false);
+                stoppedPhils.add(p.getKey());
+                LOG.debug("Stopped phil " + p.getKey() + " with: " + p.getValue());
+              }
             } else if(stoppedPhils.contains(p.getKey())){
-              manager.getPhilosopher(p.getKey()).start();
+              manager.getPhilosopher(p.getKey()).setAllowedToEat(true);
               stoppedPhils.remove(p.getKey());
             }
           } catch (RemoteException e) {
