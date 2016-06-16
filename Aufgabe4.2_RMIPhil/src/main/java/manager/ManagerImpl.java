@@ -148,6 +148,7 @@ public class ManagerImpl implements Manager, Runnable {
                 return;
 
             } catch (Exception e) {
+                e.printStackTrace();
                 unregisterRecovery(recoveryIds.get(ran));
                 ran = randomGenerator.nextInt(recoveryIds.size());
             }
