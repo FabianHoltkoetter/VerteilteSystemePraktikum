@@ -40,3 +40,13 @@ auf den Listen der registrierten Objekten durchgesetzt.
 Wie bereits in Aufgabe 3.3 wird eine Verklemmung dadurch verhindert, dass ein Platz erst eingenommen werden kann wenn beide Gabeln eines
 Platzes direkt zur verfügung stehen. Im Fall der verteilten Philosophen wird zudem noch eine Verklemmung durch "absterben" eines Philosophen
 durch die im oberen Teil beschriebene zeitliche begrenzung des Sperren einer Gabel verhindert.
+
+# Ablaufdiagramme
+
+![Initialisierung des Managers](images/Sequence_Init_Manager.png)
+
+![Initialisierung eines Philosophen](images/Sequence_Init_Philosopher.png)
+
+![Initialisierung eines TableParts](Sequence_Init_Tablepart.png)
+
+![Schleife des Philosophen](images/Run_Philosopher.png)
