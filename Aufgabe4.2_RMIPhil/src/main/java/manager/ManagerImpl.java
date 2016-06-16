@@ -1,5 +1,6 @@
 package manager;
 
+import api.Manager;
 import api.Philosopher;
 import api.Recovery;
 import api.TablePart;
@@ -9,14 +10,18 @@ import org.apache.logging.log4j.Logger;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
  * Created by Fabian on 01.06.2016.
  */
-public class ManagerImpl implements api.Manager, Runnable {
+public class ManagerImpl implements Manager, Runnable {
     private static final Logger LOG = LogManager.getLogger(ManagerImpl.class.getName());
     public static final int CHECK_INTERVAL = 1_000;
     private final Registry registry;
@@ -202,26 +207,9 @@ public class ManagerImpl implements api.Manager, Runnable {
     }
 
     @Override
-    public List<Philosopher> getPhilosophers() {
-        List<String> illegalPhilosophers = new ArrayList<>();
-        List<Philosopher> philosophers = philosopherIds.keySet().stream().map(s -> {
-            try {
-                Philosopher lookup = (Philosopher) registry.lookup(s);
-                //Cache EatCount for recovery
-                philosopherIds.put(s, new AbstractMap.SimpleEntry<>(lookup.getEatCounter(), lookup.isHungry()));
-                return lookup;
-            } catch (Exception e) {
-                illegalPhilosophers.add(s);
-                e.printStackTrace();
-                LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", s));
-            }
-            return null;
-        }).filter(r -> r != null).collect(Collectors.toList());
-
-        //Remove all illegal Philosophers
-        illegalPhilosophers.forEach(this::reportDeadPhilosopher);
-
-        return philosophers;
+    public Map<String, Integer> getPhilosophersEatCount() {
+        return philosopherIds.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getKey()));
     }
 
     @Override
@@ -274,6 +262,16 @@ public class ManagerImpl implements api.Manager, Runnable {
     }
 
     @Override
+    public Philosopher getPhilosopher(String id) throws RemoteException {
+        try {
+            return (Philosopher) registry.lookup(id);
+        } catch (NotBoundException e) {
+            LOG.error("given philosopher id dont exist anymore.");
+            return null;
+        }
+    }
+
+    @Override
     public List<String> getTableIds() throws RemoteException {
         return tableIds;
     }
@@ -322,21 +320,30 @@ public class ManagerImpl implements api.Manager, Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
+            List<String> deadPhils;
+            List<String> deadTables;
 
-            // Check all Philosophers
-            List<String> deadPhils = philosopherIds.keySet().stream().filter(philID -> {
-                try {
-                    Philosopher lookup = (Philosopher) registry.lookup(philID);
-                    lookup.isHungry();
-                    return false;
-                } catch (NotBoundException | RemoteException e) {
-                    LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
-                    return true;
-                }
-            }).collect(Collectors.toList());
-
+            synchronized (philosopherIds) {
+                // Check all Philosophers
+                deadPhils = philosopherIds.keySet().stream().filter(philID -> {
+                    try {
+                        Philosopher lookup = (Philosopher) registry.lookup(philID);
+                        //Try to get eatCounter and save it in list;
+                        int eatCount = lookup.getEatCounter();
+                        philosopherIds.put(
+                            philID,
+                            new AbstractMap.SimpleEntry<>(
+                                eatCount,
+                                philosopherIds.get(philID).getValue()));
+                        return false;
+                    } catch (NotBoundException | RemoteException e) {
+                        LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
+                        return true;
+                    }
+                }).collect(Collectors.toList());
+            }
             // Check all TableParts
-            List<String> deadTables = tableIds.stream().filter(tableID -> {
+            deadTables = tableIds.stream().filter(tableID -> {
                 try {
                     TablePart lookup = (TablePart) registry.lookup(tableID);
                     lookup.getId();

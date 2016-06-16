@@ -1,14 +1,13 @@
 package manager;
 
 import api.Manager;
-import api.Philosopher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Fabian on 08.06.2016.
@@ -17,7 +16,7 @@ public class TableMaster extends Thread {
   private static final Logger LOG = LogManager.getLogger(TableMaster.class.getName());
   private static final int PAUSE = 5000;
 
-  private int avgEatCout;
+  private double avgEatCout;
   private final Manager manager;
 
   public TableMaster(String ip) {
@@ -39,29 +38,24 @@ public class TableMaster extends Thread {
         Thread.sleep(PAUSE);
 
         //Calculate average eat count
-        List<Philosopher> philosophers = manager.getPhilosophers();
+        Map<String, Integer> philosophers = manager.getPhilosophersEatCount();
 
         LOG.info(String.format("TableMaster woke up and received %d philosophers.", philosophers.size()));
 
         if(philosophers.size() == 0)
           continue;
 
-        philosophers.forEach(philosopher -> {
-              try {
-                avgEatCout += philosopher.getEatCounter();
-              } catch (RemoteException e) {
-                e.printStackTrace();
-              }
-            }
-        );
+        avgEatCout = philosophers.values().stream().mapToInt(i->i).average().orElse(0.0);
 
         avgEatCout /= philosophers.size();
         LOG.info(String.format("Average eat count is %d", avgEatCout));
 
         //Allow or forbid philosopher to eat
-        philosophers.forEach(p -> {
+        philosophers.entrySet().forEach(p -> {
           try {
-            p.setAllowedToEat(p.getEatCounter() < avgEatCout * 1.1);
+            if(p.getValue() < avgEatCout * 1.1){
+              manager.getPhilosopher(p.getKey()).stop();
+            }
           } catch (RemoteException e) {
             e.printStackTrace();
           }
