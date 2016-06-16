@@ -43,10 +43,23 @@ durch die im oberen Teil beschriebene zeitliche begrenzung des Sperren einer Gab
 
 # Ablaufdiagramme
 
+## Genereller Aufbau
+
+![Genereller Aufbau](images/aufbau.png)
+
+## Initialisierung des Managers
+
 ![Initialisierung des Managers](images/Sequence_Init_Manager.png)
+
+## Initialisierung eines Philosophen
 
 ![Initialisierung eines Philosophen](images/Sequence_Init_Philosopher.png)
 
+## Initialisierung eines Tableparts
+
 ![Initialisierung eines TableParts](Sequence_Init_Tablepart.png)
 
+## Schleife des Philosophen
+
+![Schleife des Philosophen](images/Run_PhilosopherSketch.png)
 ![Schleife des Philosophen](images/Run_Philosopher.png)
