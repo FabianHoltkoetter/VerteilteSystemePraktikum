@@ -66,7 +66,7 @@ public class TableMaster extends Thread {
               manager.getPhilosopher(p.getKey()).setAllowedToEat(true);
               stoppedPhils.remove(p.getKey());
             }
-          } catch (RemoteException e) {
+          } catch (Exception e) {
             e.printStackTrace();
           }
         });
