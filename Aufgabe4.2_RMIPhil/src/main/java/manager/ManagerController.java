@@ -32,28 +32,6 @@ public class ManagerController {
     private static BindingProxy binder;
 
     public static void main(String[] args) {
-
-
-        try {
-            RMISocketFactory.setSocketFactory(new RMISocketFactory() {
-                public Socket createSocket(String host, int port)
-                        throws IOException {
-                    Socket socket = new Socket();
-                    socket.setSoTimeout(2000);
-                    socket.setSoLinger(false, 0);
-                    socket.connect(new InetSocketAddress(host, port), 2000);
-                    return socket;
-                }
-
-                public ServerSocket createServerSocket(int port)
-                        throws IOException {
-                    return new ServerSocket(port);
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         if (args.length == 1) {
 
             String hostIP = args[0];
