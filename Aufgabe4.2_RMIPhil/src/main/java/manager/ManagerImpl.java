@@ -305,7 +305,7 @@ public class ManagerImpl implements Manager, Runnable {
             try {
                 Philosopher lookup = (Philosopher) registry.lookup(id);
                 lookup.stop();
-            } catch (NotBoundException | RemoteException e) {
+            } catch (Exception e) {
                 LOG.error(e.getMessage());
             }
             unregisterPhilosopher(id);
@@ -336,7 +336,7 @@ public class ManagerImpl implements Manager, Runnable {
                                 eatCount,
                                 philosopherIds.get(philID).getValue()));
                         return false;
-                    } catch (NotBoundException | RemoteException e) {
+                    } catch (Exception e) {
                         LOG.error(String.format("Philosopher %s  not found. Removing from active philosophers.", philID));
                         return true;
                     }
@@ -352,7 +352,7 @@ public class ManagerImpl implements Manager, Runnable {
                     TablePart lookup = (TablePart) registry.lookup(tableID);
                     lookup.getId();
                     return false;
-                } catch (NotBoundException | RemoteException e) {
+                } catch (Exception e) {
                     LOG.error(String.format("TablePart %s  not found. Removing from active tableparts.", tableID));
                     return true;
                 }

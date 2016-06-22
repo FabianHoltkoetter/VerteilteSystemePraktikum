@@ -98,7 +98,7 @@ public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
                     try {
                         LOG.debug(String.format("Got TablePart %s", id, currentTablePart.getId()));
                         forkIndices = currentTablePart.takeSeat(id);
-                    } catch (RemoteException e) {
+                    } catch (Exception e) {
                         LOG.error("Couldn't reach first TablePart. Retreiving new first Table.");
                         currentTablePart = getFirstTable();
                     }
@@ -111,7 +111,7 @@ public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
                         try {
                             forkIndices = currentTablePart.takeSeat(id);
                             validRequest = true;
-                        } catch (RemoteException e) {
+                        } catch (Exception e) {
                             LOG.error("Error trying to take seat on table. Retrying from first Table.");
                             currentTablePart = getFirstTable();
                             validRequest = false;
@@ -137,7 +137,7 @@ public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
                         LOG.debug(String.format("ForkIndex is %s on TablePart %s", forkIndex, tablePart.getId()));
                         tablePart.leaveSeat(forkIndex);
                         firstTable = tablePart;
-                    } catch (RemoteException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         LOG.error("Error in leaveSeat on TP");
                     }
@@ -170,7 +170,7 @@ public class PhilosopherImpl implements Philosopher, Runnable, Serializable {
                 firstTable = manager.getRandomTablePart();
                 validTable = firstTable != null;
                 LOG.debug(validTable ? "Got new table" : "Retrying in 5 second.");
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 LOG.error("Error retrieving first table. Retrying in 5 second.");
                 validTable = false;
             }
