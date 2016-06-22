@@ -4,7 +4,6 @@ import api.Manager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class TableMaster extends Thread {
               stoppedPhils.remove(p.getKey());
             }
           } catch (Exception e) {
-            e.printStackTrace();
+            LOG.debug("Error on Connection");
           }
         });
 
